@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Rajdhani, Titillium_Web } from "next/font/google";
-import IntroOverlay from "@/components/IntroOverlay";
+import RacingIntro from "@/components/RacingIntro";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { BUSINESS } from "@/lib/constants";
@@ -55,7 +55,7 @@ export default function RootLayout({
       className={`${rajdhani.variable} ${titillium.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg">
-        <IntroOverlay />
+        <RacingIntro />
         <Nav />
         <main className="flex-1">{children}</main>
         <Footer />
