@@ -13,7 +13,13 @@ function formatDayLabel(date: string): string {
   });
 }
 
-export default function AdminBookingsList({ bookings }: { bookings: BookingRecord[] }) {
+export default function AdminBookingsList({
+  bookings,
+  isSuperAdmin,
+}: {
+  bookings: BookingRecord[];
+  isSuperAdmin: boolean;
+}) {
   const [pending, setPending] = useState<string | null>(null);
   const [items, setItems] = useState(bookings);
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
@@ -48,12 +54,14 @@ export default function AdminBookingsList({ bookings }: { bookings: BookingRecor
             <h1 className="text-display text-3xl">Upcoming bookings</h1>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => setShowCreateAdmin((v) => !v)}
-              className="text-sm text-ink-dim hover:text-ink border border-line rounded-md px-4 py-2 transition-colors"
-            >
-              {showCreateAdmin ? "Cancel" : "Add admin"}
-            </button>
+            {isSuperAdmin && (
+              <button
+                onClick={() => setShowCreateAdmin((v) => !v)}
+                className="text-sm text-ink-dim hover:text-ink border border-line rounded-md px-4 py-2 transition-colors"
+              >
+                {showCreateAdmin ? "Cancel" : "Add admin"}
+              </button>
+            )}
             <button
               onClick={logout}
               className="text-sm text-ink-dim hover:text-ink border border-line rounded-md px-4 py-2 transition-colors"
@@ -63,7 +71,9 @@ export default function AdminBookingsList({ bookings }: { bookings: BookingRecor
           </div>
         </div>
 
-        {showCreateAdmin && <CreateAdminForm onDone={() => setShowCreateAdmin(false)} />}
+        {isSuperAdmin && showCreateAdmin && (
+          <CreateAdminForm onDone={() => setShowCreateAdmin(false)} />
+        )}
 
         {dates.length === 0 && (
           <p className="text-ink-dim border border-dashed border-line rounded-lg p-8 text-center">

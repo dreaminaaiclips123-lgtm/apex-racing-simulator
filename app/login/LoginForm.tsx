@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type Mode = "login" | "signup" | "admin";
+type Mode = "login" | "signup";
 
 export default function LoginForm({ returnTo }: { returnTo: string | null }) {
   const [mode, setMode] = useState<Mode>("login");
@@ -30,13 +30,9 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
         setError(data.error ?? "Something went wrong.");
         return;
       }
-      // Hard navigation (not router.push+refresh): the session cookie is
-      // already set by this point (the browser applies Set-Cookie before
-      // this code runs at all), but a client-side transition can leave the
-      // root layout's cached Nav showing the logged-out state, or race with
-      // router.refresh() and appear to "get stuck". A full navigation always
-      // re-renders everything server-side with the fresh session, no cache
-      // to bust.
+      // Same login form for everyone — an account registered with the admin
+      // role lands on /admin, a regular customer lands on the homepage (or
+      // returnTo). The server decides based on the stored role, not the UI.
       window.location.assign(data.role === "admin" ? "/admin" : returnTo || "/");
     } catch {
       setError("Network error — please try again.");
@@ -74,52 +70,6 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
 
   const inputClass =
     "w-full rounded-md border border-line bg-surface-2 px-4 py-3 text-ink outline-none focus:border-accent transition-colors";
-
-  if (mode === "admin") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-bg px-6">
-        <form onSubmit={submitLogin} className="w-full max-w-sm rounded-lg border border-line bg-surface p-8">
-          <p className="text-display text-accent text-sm tracking-[0.3em] uppercase mb-2">Apex Admin</p>
-          <h1 className="text-display text-2xl mb-6">Staff sign in</h1>
-          <div className="space-y-4">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              autoFocus
-              className={inputClass}
-            />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className={inputClass}
-            />
-          </div>
-          {error && <p className="text-stop text-sm mt-3">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-5 w-full rounded-md bg-accent py-3 text-display uppercase tracking-wide text-ink disabled:opacity-50 transition-opacity"
-          >
-            {loading ? "Signing in…" : "Sign in"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMode("login");
-              setError(null);
-            }}
-            className="mt-4 w-full text-center text-xs text-ink-faint hover:text-ink-dim uppercase tracking-wide"
-          >
-            Back to customer sign in
-          </button>
-        </form>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg px-6 py-16">
@@ -219,17 +169,6 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
             {loading ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
           </button>
         </form>
-
-        <button
-          type="button"
-          onClick={() => {
-            setMode("admin");
-            setError(null);
-          }}
-          className="mt-6 w-full text-center text-[11px] text-ink-faint hover:text-ink-dim uppercase tracking-wide"
-        >
-          Apex Admin
-        </button>
       </div>
     </div>
   );

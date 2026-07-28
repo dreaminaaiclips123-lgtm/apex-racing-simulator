@@ -135,12 +135,15 @@ export default function RacingIntro() {
       ) : (
         <video
           ref={videoRef}
-          className="h-full w-full object-cover"
+          className="apex-intro-video h-full w-full object-cover pointer-events-none"
           poster="/images/racing-intro-poster.webp"
           autoPlay
           muted
           playsInline
           preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+          controlsList="nodownload nofullscreen noplaybackrate noremoteplayback"
           onPlaying={() => setPhase((p) => (p === "loading" ? "playing" : p))}
           onEnded={finish}
           onError={finish}

@@ -106,6 +106,21 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Forcibly hide native video chrome on the intro. WebKit renders a giant
+   "tap to play" overlay (-webkit-media-controls-start-playback-button) on
+   any unplayed <video>, independent of the `controls` attribute — this is
+   what shows up as a stray play/pause button. */
+.apex-intro-video::-webkit-media-controls,
+.apex-intro-video::-webkit-media-controls-start-playback-button,
+.apex-intro-video::-webkit-media-controls-panel,
+.apex-intro-video::-webkit-media-controls-play-button,
+.apex-intro-video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

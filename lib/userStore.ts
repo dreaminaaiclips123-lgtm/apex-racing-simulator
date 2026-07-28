@@ -3,6 +3,11 @@ import { get, put, BlobPreconditionFailedError } from "@vercel/blob";
 const PATHNAME = "users/store.json";
 const MAX_RETRIES = 5;
 
+// The one account allowed to create other admin accounts. Every other admin
+// (including ones this account creates) can manage bookings but not add
+// more staff logins.
+export const SUPER_ADMIN_EMAIL = "alieltoumy1@outlook.com";
+
 export type UserRole = "customer" | "admin";
 
 export interface UserRecord {

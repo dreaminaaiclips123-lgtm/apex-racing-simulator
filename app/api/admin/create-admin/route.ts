@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/session";
-import { findUserByEmail, withUsersTransaction, type UserRecord } from "@/lib/userStore";
+import {
+  findUserByEmail,
+  findUserById,
+  withUsersTransaction,
+  SUPER_ADMIN_EMAIL,
+  type UserRecord,
+} from "@/lib/userStore";
 import { hashPassword } from "@/lib/password";
 import { isValidEmail } from "@/lib/validation";
 
@@ -9,6 +15,14 @@ export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session || session.role !== "admin") {
     return NextResponse.json({ error: "Not authorized." }, { status: 401 });
+  }
+
+  const currentAdmin = await findUserById(session.userId);
+  if (!currentAdmin || currentAdmin.email !== SUPER_ADMIN_EMAIL) {
+    return NextResponse.json(
+      { error: "Only the primary admin account can add new admins." },
+      { status: 403 }
+    );
   }
 
   let body: unknown;

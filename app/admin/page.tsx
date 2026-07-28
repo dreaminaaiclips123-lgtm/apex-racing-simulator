@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { readBookings } from "@/lib/store";
 import { formatDateKey } from "@/lib/booking";
+import { findUserById, SUPER_ADMIN_EMAIL } from "@/lib/userStore";
 import AdminBookingsList from "./AdminBookingsList";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +13,9 @@ export default async function AdminPage() {
     redirect("/login?returnTo=%2Fadmin");
   }
 
+  const currentAdmin = await findUserById(session.userId);
+  const isSuperAdmin = currentAdmin?.email === SUPER_ADMIN_EMAIL;
+
   const bookings = await readBookings();
   const now = new Date();
   const todayKey = formatDateKey(now);
@@ -20,5 +24,5 @@ export default async function AdminPage() {
     (b) => b.date > todayKey || (b.date === todayKey && b.endMinute > nowMinutes)
   );
 
-  return <AdminBookingsList bookings={upcoming} />;
+  return <AdminBookingsList bookings={upcoming} isSuperAdmin={isSuperAdmin} />;
 }
