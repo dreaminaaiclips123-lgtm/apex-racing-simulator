@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import { BUSINESS } from "@/lib/constants";
 
@@ -28,7 +28,6 @@ export interface NavSession {
 }
 
 export default function Nav({ session }: { session: NavSession | null }) {
-  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -41,8 +40,7 @@ export default function Nav({ session }: { session: NavSession | null }) {
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-    router.refresh();
+    window.location.assign("/");
   }
 
   const accountHref = session?.role === "admin" ? "/admin" : "/my-bookings";
@@ -67,7 +65,7 @@ export default function Nav({ session }: { session: NavSession | null }) {
         }`}
       >
         <nav className="mx-auto max-w-7xl px-6 md:px-10 h-16 flex items-center justify-between">
-          <a href="#top" className="flex items-center">
+          <Link href="/" className="flex items-center cursor-pointer">
             <Image
               src="/logo/apex-logo.png"
               alt="Apex Racing Simulator"
@@ -76,7 +74,7 @@ export default function Nav({ session }: { session: NavSession | null }) {
               priority
               className="h-7 w-auto"
             />
-          </a>
+          </Link>
 
           <div className="hidden md:flex items-center gap-8">
             {LINKS.map((l) => (

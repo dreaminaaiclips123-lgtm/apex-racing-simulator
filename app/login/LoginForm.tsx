@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 type Mode = "login" | "signup" | "admin";
 
 export default function LoginForm({ returnTo }: { returnTo: string | null }) {
-  const router = useRouter();
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
@@ -32,12 +30,14 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
         setError(data.error ?? "Something went wrong.");
         return;
       }
-      if (data.role === "admin") {
-        router.push("/admin");
-      } else {
-        router.push(returnTo || "/my-bookings");
-      }
-      router.refresh();
+      // Hard navigation (not router.push+refresh): the session cookie is
+      // already set by this point (the browser applies Set-Cookie before
+      // this code runs at all), but a client-side transition can leave the
+      // root layout's cached Nav showing the logged-out state, or race with
+      // router.refresh() and appear to "get stuck". A full navigation always
+      // re-renders everything server-side with the fresh session, no cache
+      // to bust.
+      window.location.assign(data.role === "admin" ? "/admin" : returnTo || "/");
     } catch {
       setError("Network error — please try again.");
     } finally {
@@ -64,8 +64,7 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
         setError(data.error ?? "Something went wrong.");
         return;
       }
-      router.push(returnTo || "/my-bookings");
-      router.refresh();
+      window.location.assign(returnTo || "/");
     } catch {
       setError("Network error — please try again.");
     } finally {

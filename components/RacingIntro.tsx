@@ -3,35 +3,16 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { motion } from "motion/react";
 import { IconFlagFilled } from "@tabler/icons-react";
+import { INTRO_SEEN_COOKIE } from "@/lib/introCookie";
 
-// Bump this if the intro video is ever replaced — old sessions won't skip a new cut.
-const SESSION_KEY = "apex-intro-played-v1";
 const LOADING_TIMEOUT_MS = 4500;
 const EXIT_DURATION_S = 0.7;
 
-// Playback state machine only — whether we render at all is decided
-// separately (and on every render) from `alreadyPlayed`, see the early
-// return below. Keeping that check out of this state avoids a footgun:
-// a useState lazy initializer only runs on the very first render, which for
-// a server-rendered page is the SSR/hydration pass where session values
-// aren't known yet — baking `alreadyPlayed` into the initial state would
-// "lock in" a stale decision and could replay the video for a returning
-// visitor while leaving the page scroll-locked forever.
+// The root layout only mounts this component at all when the server-side
+// cookie check says the intro hasn't been seen this session — see
+// app/layout.tsx. That means this component itself never needs to ask "have
+// I already played?"; it can assume the answer is no the moment it mounts.
 type Phase = "loading" | "playing" | "exiting" | "done";
-
-function noopSubscribe() {
-  return () => {};
-}
-
-// sessionStorage (not localStorage): replays on a genuinely new browsing
-// session/tab, but not on every in-app navigation within the same tab.
-function getPlayedSnapshot(): boolean {
-  try {
-    return sessionStorage.getItem(SESSION_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
 
 function getReducedMotionSnapshot(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -45,18 +26,21 @@ function subscribeReducedMotion(callback: () => void) {
 
 // useSyncExternalStore (not useEffect+useState) so the real client-side value
 // lands before first paint — no SSR/hydration mismatch, no flash of content.
-function useAlreadyPlayed(): boolean {
-  return useSyncExternalStore(noopSubscribe, getPlayedSnapshot, () => false);
-}
-
 function useReducedMotion(): boolean {
   return useSyncExternalStore(subscribeReducedMotion, getReducedMotionSnapshot, () => false);
 }
 
+function markIntroSeen() {
+  // Plain session cookie (no Max-Age): cleared when the browser fully
+  // quits, read server-side on the next request to decide whether to
+  // mount this component at all.
+  document.cookie = `${INTRO_SEEN_COOKIE}=1; path=/`;
+}
+
 export default function RacingIntro() {
-  const alreadyPlayed = useAlreadyPlayed();
   const reducedMotion = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("loading");
+  const videoRef = useRef<HTMLVideoElement>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   // Mirrors `phase` synchronously so timeout callbacks never act on a stale
   // closure value (setState's functional form can't help here since we need
@@ -66,17 +50,16 @@ export default function RacingIntro() {
     phaseRef.current = phase;
   }, [phase]);
 
-  function markPlayed() {
-    try {
-      sessionStorage.setItem(SESSION_KEY, "1");
-    } catch {}
-  }
+  // Mark this session as "seen" the instant we mount — a refresh mid-intro
+  // shouldn't replay it either.
+  useEffect(() => {
+    markIntroSeen();
+  }, []);
 
   function finish() {
     if (phaseRef.current === "done" || phaseRef.current === "exiting") return;
     timers.current.forEach(clearTimeout);
     timers.current = [];
-    markPlayed();
     phaseRef.current = "exiting";
     setPhase("exiting");
     timers.current.push(setTimeout(() => setPhase("done"), EXIT_DURATION_S * 1000));
@@ -85,41 +68,50 @@ export default function RacingIntro() {
   // Schedules the timer for whichever opening state we're in. Purely a side
   // effect — never decides `phase` synchronously in here.
   useEffect(() => {
-    if (alreadyPlayed || phase !== "loading") return;
+    if (phase !== "loading") return;
     const delay = reducedMotion ? 1100 : LOADING_TIMEOUT_MS;
     const t = setTimeout(() => {
       if (phaseRef.current === "loading") finish();
     }, delay);
     timers.current.push(t);
     return () => timers.current.forEach(clearTimeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alreadyPlayed, reducedMotion, phase]);
+  }, [reducedMotion, phase]);
+
+  // Belt-and-suspenders autoplay: the declarative autoPlay/muted attributes
+  // should be enough, but some browsers only honor autoplay reliably when
+  // `.muted` is also set imperatively before an explicit `.play()` call.
+  useEffect(() => {
+    if (reducedMotion || phase === "done") return;
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = true;
+    video.play().catch(() => {
+      // Autoplay was blocked for some reason — the loading-timeout guard
+      // above will still move the visitor on to the homepage.
+    });
+  }, [reducedMotion, phase]);
 
   // Lock scroll for as long as the intro actually occupies the screen.
   useEffect(() => {
-    const active = !alreadyPlayed && phase !== "done";
-    if (!active) return;
+    if (phase === "done") return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [alreadyPlayed, phase]);
+  }, [phase]);
 
-  // Escape skips, same as the visible Skip button.
+  // Escape skips, as a hidden accessibility fallback.
   useEffect(() => {
-    const active = !alreadyPlayed && (phase === "loading" || phase === "playing");
-    if (!active) return;
+    if (phase !== "loading" && phase !== "playing") return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") finish();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alreadyPlayed, phase]);
+  }, [phase]);
 
-  // Re-checked every render (not just at mount) — see the Phase comment above.
-  if (alreadyPlayed || phase === "done") return null;
+  if (phase === "done") return null;
 
   return (
     <motion.div
@@ -142,6 +134,7 @@ export default function RacingIntro() {
         </motion.div>
       ) : (
         <video
+          ref={videoRef}
           className="h-full w-full object-cover"
           poster="/images/racing-intro-poster.webp"
           autoPlay

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Rajdhani, Titillium_Web } from "next/font/google";
 import RacingIntro from "@/components/RacingIntro";
 import Nav from "@/components/Nav";
@@ -6,6 +7,7 @@ import Footer from "@/components/Footer";
 import { BUSINESS } from "@/lib/constants";
 import { getSession } from "@/lib/session";
 import { findUserById } from "@/lib/userStore";
+import { INTRO_SEEN_COOKIE } from "@/lib/introCookie";
 import "./globals.css";
 
 const rajdhani = Rajdhani({
@@ -55,13 +57,20 @@ export default async function RootLayout({
   const user = session ? await findUserById(session.userId) : null;
   const navSession = user ? { role: user.role, name: user.name } : null;
 
+  const cookieStore = await cookies();
+  const introSeen = cookieStore.get(INTRO_SEEN_COOKIE)?.value === "1";
+
   return (
     <html
       lang="en"
       className={`${rajdhani.variable} ${titillium.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg">
-        <RacingIntro />
+        {/* Gated server-side (not just client-side sessionStorage): the server
+            must never emit the video/poster markup for a returning-within-
+            session visitor, or the browser paints the poster natively before
+            hydration can hide it — that's the "flash" bug on subpage loads. */}
+        {!introSeen && <RacingIntro />}
         <Nav session={navSession} />
         <main className="flex-1">{children}</main>
         <Footer />

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { bookingStartDate, minutesToLabel, parseDateKey, type BookingRecord } from "@/lib/booking";
 import { MODES, SIMULATORS } from "@/lib/constants";
@@ -17,7 +16,6 @@ function formatDayLabel(date: string): string {
 }
 
 export default function MyBookingsList({ bookings }: { bookings: BookingRecord[] }) {
-  const router = useRouter();
   const [items, setItems] = useState(bookings);
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,8 +30,7 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-    router.refresh();
+    window.location.assign("/");
   }
 
   async function cancel(id: string) {
@@ -50,14 +47,14 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
   }
 
   return (
-    <div className="min-h-screen bg-bg px-6 py-10 md:px-12">
+    <div className="min-h-screen bg-bg px-6 pt-28 pb-10 md:px-12 md:pt-32">
       <div className="mx-auto max-w-4xl">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col gap-5 border-b border-line pb-6 mb-8 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-accent-2 text-xs tracking-[0.3em] uppercase">Apex</p>
             <h1 className="text-display text-3xl">My bookings</h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/#book"
               className="rounded-md bg-accent px-4 py-2 text-sm text-display uppercase tracking-wide text-ink"

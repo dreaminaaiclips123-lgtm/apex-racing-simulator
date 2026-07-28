@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { minutesToLabel, parseDateKey, type BookingRecord } from "@/lib/booking";
 import { MODES, SIMULATORS } from "@/lib/constants";
 import CreateAdminForm from "./CreateAdminForm";
@@ -15,15 +14,13 @@ function formatDayLabel(date: string): string {
 }
 
 export default function AdminBookingsList({ bookings }: { bookings: BookingRecord[] }) {
-  const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
   const [items, setItems] = useState(bookings);
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/");
-    router.refresh();
+    window.location.assign("/");
   }
 
   async function cancel(id: string) {
@@ -43,14 +40,14 @@ export default function AdminBookingsList({ bookings }: { bookings: BookingRecor
   for (const d of dates) grouped[d].sort((a, b) => a.startMinute - b.startMinute);
 
   return (
-    <div className="min-h-screen bg-bg px-6 py-10 md:px-12">
+    <div className="min-h-screen bg-bg px-6 pt-28 pb-10 md:px-12 md:pt-32">
       <div className="mx-auto max-w-4xl">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col gap-5 border-b border-line pb-6 mb-8 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-display text-accent text-sm tracking-[0.3em] uppercase">Apex / Staff</p>
             <h1 className="text-display text-3xl">Upcoming bookings</h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => setShowCreateAdmin((v) => !v)}
               className="text-sm text-ink-dim hover:text-ink border border-line rounded-md px-4 py-2 transition-colors"
