@@ -8,6 +8,8 @@ import {
   type BookingRecord,
 } from "@/lib/booking";
 import { readBookings, withBookingsTransaction } from "@/lib/store";
+import { getSession } from "@/lib/session";
+import { findUserById } from "@/lib/userStore";
 import {
   BOOKABLE_DAYS_AHEAD,
   MODE_ORDER,
@@ -62,8 +64,6 @@ interface CreateBookingBody {
   startMinute: number;
   duration: DurationMinutes;
   mode: SimMode;
-  customerName: string;
-  customerPhone: string;
 }
 
 function isCreateBookingBody(body: unknown): body is CreateBookingBody {
@@ -73,13 +73,23 @@ function isCreateBookingBody(body: unknown): body is CreateBookingBody {
     typeof b.date === "string" &&
     typeof b.startMinute === "number" &&
     typeof b.duration === "number" &&
-    typeof b.mode === "string" &&
-    typeof b.customerName === "string" &&
-    typeof b.customerPhone === "string"
+    typeof b.mode === "string"
   );
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getSession();
+  if (!session || session.role !== "customer") {
+    return NextResponse.json({ error: "Sign in to book a slot." }, { status: 401 });
+  }
+  const user = await findUserById(session.userId);
+  if (!user) {
+    return NextResponse.json({ error: "Sign in to book a slot." }, { status: 401 });
+  }
+  if (!user.name || !user.phone) {
+    return NextResponse.json({ error: "Complete your profile before booking." }, { status: 403 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
@@ -91,9 +101,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing booking details." }, { status: 400 });
   }
 
-  const { date, startMinute, duration, mode, customerName, customerPhone } = body;
-  const name = customerName.trim().slice(0, 80);
-  const phone = customerPhone.trim().slice(0, 30);
+  const { date, startMinute, duration, mode } = body;
 
   if (!isValidDate(date)) {
     return NextResponse.json({ error: "Invalid or out-of-range date." }, { status: 400 });
@@ -106,12 +114,6 @@ export async function POST(req: NextRequest) {
   }
   if (!Number.isInteger(startMinute) || startMinute < 0) {
     return NextResponse.json({ error: "Invalid start time." }, { status: 400 });
-  }
-  if (name.length < 2) {
-    return NextResponse.json({ error: "Enter your name." }, { status: 400 });
-  }
-  if (!/^[\d+\s-]{8,20}$/.test(phone)) {
-    return NextResponse.json({ error: "Enter a valid phone number." }, { status: 400 });
   }
   if (isPastSlot(date, startMinute, new Date())) {
     return NextResponse.json({ error: "That slot is in the past." }, { status: 400 });
@@ -131,8 +133,9 @@ export async function POST(req: NextRequest) {
       endMinute,
       mode,
       simId,
-      customerName: name,
-      customerPhone: phone,
+      userId: user.id,
+      customerName: user.name,
+      customerPhone: user.phone,
       createdAt: new Date().toISOString(),
     };
     return { bookings: [...bookings, booking], result: booking };

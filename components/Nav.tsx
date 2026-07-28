@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import { BUSINESS } from "@/lib/constants";
@@ -21,7 +22,13 @@ const TICKER_ITEMS = [
   `OPEN ${BUSINESS.openHour}:00 – 00:00`,
 ];
 
-export default function Nav() {
+export interface NavSession {
+  role: "customer" | "admin";
+  name: string;
+}
+
+export default function Nav({ session }: { session: NavSession | null }) {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -31,6 +38,15 @@ export default function Nav() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/");
+    router.refresh();
+  }
+
+  const accountHref = session?.role === "admin" ? "/admin" : "/my-bookings";
+  const accountLabel = session?.role === "admin" ? "Admin" : "My Bookings";
 
   return (
     <header className="fixed top-0 inset-x-0 z-50">
@@ -76,6 +92,20 @@ export default function Nav() {
 
           <div className="flex items-center gap-3">
             <a
+              href={session ? accountHref : "/login"}
+              className="hidden sm:inline text-sm text-ink-dim hover:text-ink transition-colors uppercase tracking-wide"
+            >
+              {session ? accountLabel : "Log in"}
+            </a>
+            {session && (
+              <button
+                onClick={logout}
+                className="hidden sm:inline text-sm text-ink-dim hover:text-ink transition-colors uppercase tracking-wide"
+              >
+                Log out
+              </button>
+            )}
+            <a
               href="#book"
               className="hidden sm:inline-flex items-center rounded-md bg-accent px-5 py-2.5 text-sm text-display uppercase tracking-wide text-ink hover:bg-ink hover:text-bg transition-colors"
             >
@@ -104,6 +134,24 @@ export default function Nav() {
               {l.label}
             </a>
           ))}
+          <a
+            href={session ? accountHref : "/login"}
+            onClick={() => setOpen(false)}
+            className="text-ink-dim hover:text-ink uppercase tracking-wide text-sm"
+          >
+            {session ? accountLabel : "Log in"}
+          </a>
+          {session && (
+            <button
+              onClick={() => {
+                setOpen(false);
+                logout();
+              }}
+              className="text-left text-ink-dim hover:text-ink uppercase tracking-wide text-sm"
+            >
+              Log out
+            </button>
+          )}
           <a
             href="#book"
             onClick={() => setOpen(false)}

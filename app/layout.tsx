@@ -4,6 +4,8 @@ import RacingIntro from "@/components/RacingIntro";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { BUSINESS } from "@/lib/constants";
+import { getSession } from "@/lib/session";
+import { findUserById } from "@/lib/userStore";
 import "./globals.css";
 
 const rajdhani = Rajdhani({
@@ -44,11 +46,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSession();
+  const user = session ? await findUserById(session.userId) : null;
+  const navSession = user ? { role: user.role, name: user.name } : null;
+
   return (
     <html
       lang="en"
@@ -56,7 +62,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-bg">
         <RacingIntro />
-        <Nav />
+        <Nav session={navSession} />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

@@ -13,6 +13,7 @@ export interface BookingRecord {
   endMinute: number;
   mode: SimMode;
   simId: number;
+  userId: string;
   customerName: string;
   customerPhone: string;
   createdAt: string; // ISO timestamp
@@ -37,6 +38,13 @@ export function minutesToLabel(minutes: number): string {
   const h = Math.floor(minutes / 60) % 24;
   const m = minutes % 60;
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+/** The real Date a booking starts at, for cutoff comparisons (e.g. the 6h cancel window). */
+export function bookingStartDate(date: string, startMinute: number): Date {
+  const start = parseDateKey(date);
+  start.setMinutes(start.getMinutes() + startMinute);
+  return start;
 }
 
 export function dayOpenMinute(): number {

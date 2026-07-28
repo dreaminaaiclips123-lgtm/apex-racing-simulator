@@ -1,18 +1,15 @@
-import { cookies } from "next/headers";
-import { ADMIN_COOKIE, isValidAdminToken } from "@/lib/admin";
+import { redirect } from "next/navigation";
+import { getSession } from "@/lib/session";
 import { readBookings } from "@/lib/store";
 import { formatDateKey } from "@/lib/booking";
-import AdminLogin from "./AdminLogin";
 import AdminBookingsList from "./AdminBookingsList";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ADMIN_COOKIE)?.value;
-
-  if (!isValidAdminToken(token)) {
-    return <AdminLogin />;
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    redirect("/login?returnTo=%2Fadmin");
   }
 
   const bookings = await readBookings();

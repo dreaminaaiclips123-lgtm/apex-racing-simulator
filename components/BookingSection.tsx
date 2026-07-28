@@ -1,7 +1,12 @@
+import { getSession } from "@/lib/session";
+import { findUserById } from "@/lib/userStore";
 import Reveal from "./Reveal";
 import BookingSystem from "./BookingSystem";
 
-export default function BookingSection() {
+export default async function BookingSection() {
+  const session = await getSession();
+  const user = session?.role === "customer" ? await findUserById(session.userId) : null;
+
   return (
     <section id="book" className="relative bg-bg py-24 md:py-32">
       <div className="mx-auto max-w-5xl px-6 md:px-10">
@@ -16,7 +21,7 @@ export default function BookingSection() {
           </p>
         </Reveal>
         <Reveal delay={0.1}>
-          <BookingSystem />
+          <BookingSystem customerName={user?.name ?? null} />
         </Reveal>
       </div>
     </section>

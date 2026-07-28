@@ -60,7 +60,7 @@ function buildDays(): { key: string; weekday: string; day: string; month: string
   return days;
 }
 
-export default function BookingSystem() {
+export default function BookingSystem({ customerName }: { customerName: string | null }) {
   const days = useMemo(() => buildDays(), []);
   const [date, setDate] = useState(days[0].key);
   const [mode, setMode] = useState<SimMode>("f1");
@@ -69,8 +69,6 @@ export default function BookingSystem() {
   const [loadingSlots, setLoadingSlots] = useState(true);
   const [slotsError, setSlotsError] = useState<string | null>(null);
   const [startMinute, setStartMinute] = useState<number | null>(null);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null);
@@ -133,14 +131,7 @@ export default function BookingSystem() {
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          date,
-          startMinute,
-          duration,
-          mode,
-          customerName: name,
-          customerPhone: phone,
-        }),
+        body: JSON.stringify({ date, startMinute, duration, mode }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -177,7 +168,7 @@ export default function BookingSystem() {
     const waText = encodeURIComponent(
       `Hi Apex! Just booked ${MODES[confirmation.mode].label} on ${dateLabel} at ` +
         `${minutesToLabel(confirmation.startMinute)}–${minutesToLabel(confirmation.endMinute)} ` +
-        `(Bay ${String(confirmation.simId).padStart(2, "0")}). Name: ${name}.`
+        `(Bay ${String(confirmation.simId).padStart(2, "0")}). Name: ${customerName}.`
     );
     return (
       <div className="rounded-xl border border-go/40 bg-go-dim p-8 md:p-12 text-center">
@@ -202,8 +193,6 @@ export default function BookingSystem() {
             onClick={() => {
               setConfirmation(null);
               setStartMinute(null);
-              setName("");
-              setPhone("");
             }}
             className="rounded-md border border-line px-6 py-3 text-display uppercase tracking-wide text-ink-dim hover:text-ink"
           >
@@ -339,22 +328,9 @@ export default function BookingSystem() {
       {/* details + confirm */}
       {startMinute !== null && (
         <div className="p-6 md:p-8 bg-surface-2">
-          <p className="text-xs uppercase tracking-[0.3em] text-ink-dim mb-4">5. Your details</p>
-          <div className="grid gap-4 sm:grid-cols-2 mb-5">
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Full name"
-              className="rounded-md border border-line bg-surface px-4 py-3 text-ink outline-none focus:border-accent transition-colors"
-            />
-            <input
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Phone number"
-              type="tel"
-              className="rounded-md border border-line bg-surface px-4 py-3 text-ink outline-none focus:border-accent transition-colors"
-            />
-          </div>
+          <p className="text-xs uppercase tracking-[0.3em] text-ink-dim mb-4">
+            5. {customerName ? "Confirm" : "Sign in to confirm"}
+          </p>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-md border border-line bg-surface p-4">
             <p className="text-sm text-ink-dim">
@@ -364,20 +340,32 @@ export default function BookingSystem() {
                 {PRICING[duration]} EGP
               </span>
             </p>
-            <button
-              onClick={confirmBooking}
-              disabled={submitting || name.trim().length < 2 || phone.trim().length < 8}
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3 text-display uppercase tracking-wide text-ink disabled:opacity-40 transition-opacity"
-            >
-              {submitting ? (
-                <IconLoader2 size={18} className="animate-spin" />
-              ) : (
-                <>
-                  Confirm booking <IconArrowRight size={16} />
-                </>
-              )}
-            </button>
+            {customerName ? (
+              <button
+                onClick={confirmBooking}
+                disabled={submitting}
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3 text-display uppercase tracking-wide text-ink disabled:opacity-40 transition-opacity"
+              >
+                {submitting ? (
+                  <IconLoader2 size={18} className="animate-spin" />
+                ) : (
+                  <>
+                    Confirm booking <IconArrowRight size={16} />
+                  </>
+                )}
+              </button>
+            ) : (
+              <a
+                href={`/login?returnTo=${encodeURIComponent("/#book")}`}
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3 text-display uppercase tracking-wide text-ink"
+              >
+                Sign in to book <IconArrowRight size={16} />
+              </a>
+            )}
           </div>
+          {customerName && (
+            <p className="text-xs text-ink-faint mt-3">Booking as {customerName}.</p>
+          )}
           {submitError && (
             <p className="flex items-center gap-2 text-stop text-sm mt-3">
               <IconAlertTriangle size={16} />

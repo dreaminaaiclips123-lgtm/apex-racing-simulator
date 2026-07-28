@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { minutesToLabel, parseDateKey, type BookingRecord } from "@/lib/booking";
 import { MODES, SIMULATORS } from "@/lib/constants";
+import CreateAdminForm from "./CreateAdminForm";
 
 function formatDayLabel(date: string): string {
   return parseDateKey(date).toLocaleDateString("en-GB", {
@@ -17,9 +18,11 @@ export default function AdminBookingsList({ bookings }: { bookings: BookingRecor
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
   const [items, setItems] = useState(bookings);
+  const [showCreateAdmin, setShowCreateAdmin] = useState(false);
 
   async function logout() {
-    await fetch("/api/admin/logout", { method: "POST" });
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/");
     router.refresh();
   }
 
@@ -47,13 +50,23 @@ export default function AdminBookingsList({ bookings }: { bookings: BookingRecor
             <p className="text-display text-accent text-sm tracking-[0.3em] uppercase">Apex / Staff</p>
             <h1 className="text-display text-3xl">Upcoming bookings</h1>
           </div>
-          <button
-            onClick={logout}
-            className="text-sm text-ink-dim hover:text-ink border border-line rounded-md px-4 py-2 transition-colors"
-          >
-            Log out
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowCreateAdmin((v) => !v)}
+              className="text-sm text-ink-dim hover:text-ink border border-line rounded-md px-4 py-2 transition-colors"
+            >
+              {showCreateAdmin ? "Cancel" : "Add admin"}
+            </button>
+            <button
+              onClick={logout}
+              className="text-sm text-ink-dim hover:text-ink border border-line rounded-md px-4 py-2 transition-colors"
+            >
+              Log out
+            </button>
+          </div>
         </div>
+
+        {showCreateAdmin && <CreateAdminForm onDone={() => setShowCreateAdmin(false)} />}
 
         {dates.length === 0 && (
           <p className="text-ink-dim border border-dashed border-line rounded-lg p-8 text-center">
