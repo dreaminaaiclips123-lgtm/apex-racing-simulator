@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { IconFlagFilled, IconMenu2, IconX } from "@tabler/icons-react";
+import Image from "next/image";
+import { IconMenu2, IconX } from "@tabler/icons-react";
 import { BUSINESS } from "@/lib/constants";
 
 const LINKS = [
@@ -50,9 +51,15 @@ export default function Nav() {
         }`}
       >
         <nav className="mx-auto max-w-7xl px-6 md:px-10 h-16 flex items-center justify-between">
-          <a href="#top" className="flex items-center gap-2 text-display text-xl tracking-wide">
-            <IconFlagFilled size={20} className="text-accent" />
-            APEX
+          <a href="#top" className="flex items-center">
+            <Image
+              src="/logo/apex-logo.png"
+              alt="Apex Racing Simulator"
+              width={350}
+              height={100}
+              priority
+              className="h-7 w-auto"
+            />
           </a>
 
           <div className="hidden md:flex items-center gap-8">

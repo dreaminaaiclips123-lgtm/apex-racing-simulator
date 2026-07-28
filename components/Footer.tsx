@@ -1,7 +1,7 @@
+import Image from "next/image";
 import {
   IconBrandInstagram,
   IconBrandWhatsapp,
-  IconFlagFilled,
   IconMapPin,
   IconPhone,
 } from "@tabler/icons-react";
@@ -14,10 +14,13 @@ export default function Footer() {
     <footer className="grain border-t border-line bg-surface">
       <div className="mx-auto max-w-7xl px-6 md:px-10 py-14 grid gap-10 md:grid-cols-3">
         <div>
-          <div className="flex items-center gap-2 text-display text-2xl mb-3">
-            <IconFlagFilled size={22} className="text-accent" />
-            APEX
-          </div>
+          <Image
+            src="/logo/apex-logo.png"
+            alt="Apex Racing Simulator"
+            width={350}
+            height={100}
+            className="h-9 w-auto mb-3"
+          />
           <p className="text-ink-dim text-sm max-w-xs">{BUSINESS.tagline}.</p>
           <div className="flex gap-3 mt-5">
             <a

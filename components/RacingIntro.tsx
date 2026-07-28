@@ -159,16 +159,6 @@ export default function RacingIntro() {
           <source src="/videos/racing-intro-desktop.mp4" type="video/mp4" />
         </video>
       )}
-
-      {(phase === "loading" || phase === "playing") && (
-        <button
-          onClick={finish}
-          aria-label="Skip intro"
-          className="absolute bottom-5 right-5 sm:bottom-6 sm:right-6 rounded-md border border-ink/30 bg-bg/60 backdrop-blur px-4 py-2.5 text-xs uppercase tracking-[0.2em] text-ink hover:border-accent hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent transition-colors"
-        >
-          Skip intro
-        </button>
-      )}
     </motion.div>
   );
 }
