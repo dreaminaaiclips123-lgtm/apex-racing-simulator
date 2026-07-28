@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   // Same generic message whether the email is unknown or the password is wrong —
   // don't tell an attacker which one they got right.
   const genericError = "Incorrect email or password.";
-  if (!user || !user.passwordHash) {
+  if (!user) {
     return NextResponse.json({ error: genericError }, { status: 401 });
   }
 
@@ -33,8 +33,7 @@ export async function POST(req: NextRequest) {
   }
 
   const token = createSessionToken({ userId: user.id, role: user.role });
-  const needsProfile = user.role === "customer" && (!user.dob || !user.phone);
-  const res = NextResponse.json({ ok: true, role: user.role, needsProfile });
+  const res = NextResponse.json({ ok: true, role: user.role });
   res.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: true,

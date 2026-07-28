@@ -3,18 +3,15 @@ import { get, put, BlobPreconditionFailedError } from "@vercel/blob";
 const PATHNAME = "users/store.json";
 const MAX_RETRIES = 5;
 
-export type AuthProvider = "credentials" | "google" | "facebook";
 export type UserRole = "customer" | "admin";
 
 export interface UserRecord {
   id: string;
   email: string; // stored lowercase
   name: string;
-  dob: string; // "YYYY-MM-DD" — empty until an OAuth signup completes their profile
-  phone: string; // empty until an OAuth signup completes their profile
-  passwordHash: string | null; // null for OAuth-only accounts
-  provider: AuthProvider;
-  providerAccountId: string | null;
+  dob: string; // "YYYY-MM-DD"
+  phone: string;
+  passwordHash: string;
   role: UserRole;
   createdAt: string;
 }

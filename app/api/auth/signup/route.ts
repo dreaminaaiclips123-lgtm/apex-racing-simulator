@@ -53,8 +53,6 @@ export async function POST(req: NextRequest) {
       dob,
       phone,
       passwordHash,
-      provider: "credentials",
-      providerAccountId: null,
       role: "customer",
       createdAt: new Date().toISOString(),
     };

@@ -2,28 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconBrandFacebook, IconBrandGoogle } from "@tabler/icons-react";
 
 type Mode = "login" | "signup" | "admin";
 
-const OAUTH_ERROR_MESSAGES: Record<string, string> = {
-  google_not_configured: "Google sign-in isn't set up yet.",
-  facebook_not_configured: "Facebook sign-in isn't set up yet.",
-  oauth_failed: "Something went wrong signing in — please try again.",
-  oauth_no_email: "That account didn't share an email with us — try a different sign-in method.",
-};
-
-export default function LoginForm({
-  googleEnabled,
-  facebookEnabled,
-  returnTo,
-  oauthError,
-}: {
-  googleEnabled: boolean;
-  facebookEnabled: boolean;
-  returnTo: string | null;
-  oauthError: string | null;
-}) {
+export default function LoginForm({ returnTo }: { returnTo: string | null }) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
@@ -33,12 +15,7 @@ export default function LoginForm({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(
-    oauthError ? (OAUTH_ERROR_MESSAGES[oauthError] ?? "Something went wrong.") : null
-  );
-
-  const oauthHref = (provider: "google" | "facebook") =>
-    `/api/auth/${provider}/start${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ""}`;
+  const [error, setError] = useState<string | null>(null);
 
   async function submitLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -57,8 +34,6 @@ export default function LoginForm({
       }
       if (data.role === "admin") {
         router.push("/admin");
-      } else if (data.needsProfile) {
-        router.push("/complete-profile");
       } else {
         router.push(returnTo || "/my-bookings");
       }
@@ -181,34 +156,6 @@ export default function LoginForm({
             Sign up
           </button>
         </div>
-
-        {(googleEnabled || facebookEnabled) && (
-          <div className="space-y-2.5 mb-6">
-            {googleEnabled && (
-              <a
-                href={oauthHref("google")}
-                className="flex items-center justify-center gap-2 rounded-md border border-line py-3 text-sm text-ink hover:border-ink-dim transition-colors"
-              >
-                <IconBrandGoogle size={18} />
-                Continue with Google
-              </a>
-            )}
-            {facebookEnabled && (
-              <a
-                href={oauthHref("facebook")}
-                className="flex items-center justify-center gap-2 rounded-md border border-line py-3 text-sm text-ink hover:border-ink-dim transition-colors"
-              >
-                <IconBrandFacebook size={18} />
-                Continue with Facebook
-              </a>
-            )}
-            <div className="flex items-center gap-3 pt-1">
-              <div className="h-px flex-1 bg-line" />
-              <span className="text-[11px] text-ink-faint uppercase tracking-wide">or</span>
-              <div className="h-px flex-1 bg-line" />
-            </div>
-          </div>
-        )}
 
         <form onSubmit={mode === "login" ? submitLogin : submitSignup} className="space-y-4">
           {mode === "signup" && (
