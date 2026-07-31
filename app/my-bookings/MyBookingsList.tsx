@@ -100,7 +100,7 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
                       </td>
                       <td className="px-4 py-3">{MODES[b.mode].label}</td>
                       <td className="px-4 py-3">
-                        {SIMULATORS.find((s) => s.id === b.simId)?.name ?? `Bay ${b.simId}`}
+                        {SIMULATORS.find((s) => s.id === b.simId)?.name ?? `Simulator ${b.simId}`}
                       </td>
                       <td className="px-4 py-3 text-right">
                         {cancellable ? (
@@ -147,7 +147,7 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
                       </td>
                       <td className="px-4 py-3">{MODES[b.mode].label}</td>
                       <td className="px-4 py-3">
-                        {SIMULATORS.find((s) => s.id === b.simId)?.name ?? `Bay ${b.simId}`}
+                        {SIMULATORS.find((s) => s.id === b.simId)?.name ?? `Simulator ${b.simId}`}
                       </td>
                     </tr>
                   ))}

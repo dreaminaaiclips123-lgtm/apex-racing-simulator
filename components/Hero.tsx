@@ -6,9 +6,9 @@ import { BUSINESS } from "@/lib/constants";
 
 const STATS = [
   { value: `${BUSINESS.googleRating}`, label: "Google rating" },
-  { value: BUSINESS.instagramFollowers, label: "Instagram followers" },
+  { value: `${BUSINESS.closeHour - BUSINESS.openHour}`, label: "Hours open daily" },
   { value: "4", label: "Racing rigs" },
-  { value: "2", label: "Drift bays" },
+  { value: "2", label: "Drift simulators" },
 ];
 
 export default function Hero() {
@@ -44,7 +44,7 @@ export default function Hero() {
           transition={{ duration: 0.6 }}
           className="text-accent-2 text-xs md:text-sm tracking-[0.4em] uppercase mb-5"
         >
-          New Cairo&apos;s Sim Racing HQ
+          Where New Cairo Comes To Race
         </motion.p>
 
         <motion.h1
@@ -65,7 +65,7 @@ export default function Hero() {
           className="mt-6 max-w-xl mx-auto text-ink-dim text-base md:text-lg"
         >
           {BUSINESS.tagline}. Four pro-grade rigs, real racing feel, zero waiting
-          on hold. Pick F1, Drift, Highway or Race — and lock your bay in.
+          on hold. Pick F1, Drift, Highway or Race — and lock your simulator in.
         </motion.p>
 
         <motion.div
@@ -92,21 +92,23 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.45 }}
-          className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-4 max-w-2xl mx-auto"
+          className="mt-14 max-w-2xl mx-auto border-t border-line pt-6"
         >
-          {STATS.map((s) => (
-            <div key={s.label} className="border-t border-line pt-3">
-              <p className="text-display text-2xl md:text-3xl text-ink flex items-center justify-center gap-1">
-                {s.label === "Google rating" && (
-                  <IconStarFilled size={18} className="text-accent-2" />
-                )}
-                {s.value}
-              </p>
-              <p className="text-[11px] text-ink-faint uppercase tracking-wide mt-1">
-                {s.label}
-              </p>
-            </div>
-          ))}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-4">
+            {STATS.map((s) => (
+              <div key={s.label}>
+                <p className="text-display text-2xl md:text-3xl text-ink flex items-center justify-center gap-1">
+                  {s.label === "Google rating" && (
+                    <IconStarFilled size={18} className="text-accent-2" />
+                  )}
+                  {s.value}
+                </p>
+                <p className="text-[11px] text-ink-faint uppercase tracking-wide mt-1">
+                  {s.label}
+                </p>
+              </div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>

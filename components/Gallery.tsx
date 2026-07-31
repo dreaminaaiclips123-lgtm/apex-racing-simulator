@@ -12,7 +12,7 @@ export default function Gallery() {
         <Reveal className="max-w-xl">
           <p className="text-accent-2 text-xs tracking-[0.4em] uppercase mb-4">Inside the garage</p>
           <h2 className="text-display text-4xl md:text-5xl uppercase text-ink leading-[0.95]">
-            The bays, live
+            The simulators, live
           </h2>
         </Reveal>
 

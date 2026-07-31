@@ -75,7 +75,7 @@ function overlaps(aStart: number, aEnd: number, bStart: number, bEnd: number): b
 
 /**
  * Which rig would this booking claim, if any?
- * Non-drift requests prefer non-drift-capable rigs first so the 2 drift bays
+ * Non-drift requests prefer non-drift-capable rigs first so the 2 drift simulators
  * stay free for longer — drift is the scarcer resource.
  */
 export function assignRig(

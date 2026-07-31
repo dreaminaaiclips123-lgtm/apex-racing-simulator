@@ -10,7 +10,7 @@ const FEATURES = [
   {
     icon: IconGauge,
     title: "4 multi-mode rigs",
-    body: "Every bay runs F1, Race and Highway. Bays 03 & 04 are drift-tuned for full-send slides.",
+    body: "Every simulator runs F1, Race and Highway. Simulators 03 & 04 are drift-tuned for full-send slides.",
   },
   {
     icon: IconHeadset,
@@ -20,7 +20,7 @@ const FEATURES = [
   {
     icon: IconUsers,
     title: "Built for the crew",
-    body: "Birthdays, corporate nights, or just the squad after work — book bays side by side.",
+    body: "Birthdays, corporate nights, or just the squad after work — book simulators side by side.",
   },
 ];
 

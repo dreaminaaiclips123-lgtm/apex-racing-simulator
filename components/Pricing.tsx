@@ -27,7 +27,7 @@ export default function Pricing() {
             One rate. Every mode.
           </h2>
           <p className="mt-5 text-ink-dim text-base md:text-lg">
-            F1, Drift, Highway or Race — same price either way. Pay at the bay.
+            F1, Drift, Highway or Race — same price either way. Pay on arrival.
           </p>
         </Reveal>
 

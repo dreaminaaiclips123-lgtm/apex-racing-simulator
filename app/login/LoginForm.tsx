@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 type Mode = "login" | "signup";
 
@@ -12,6 +13,7 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,13 +49,17 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
       setError("Passwords don't match.");
       return;
     }
+    if (!agreedToTerms) {
+      setError("Please agree to the Terms of Service and Privacy Policy to continue.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, dob, phone, email, password }),
+        body: JSON.stringify({ name, dob, phone, email, password, agreedToTerms }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -159,11 +165,42 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
             />
           )}
 
+          {mode === "signup" && (
+            <label className="flex items-start gap-2.5 text-sm text-ink-dim">
+              <input
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
+              />
+              <span>
+                I agree to the{" "}
+                <Link
+                  href="/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  Privacy Policy
+                </Link>
+              </span>
+            </label>
+          )}
+
           {error && <p className="text-stop text-sm">{error}</p>}
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (mode === "signup" && !agreedToTerms)}
             className="w-full rounded-md bg-accent py-3 text-display uppercase tracking-wide text-ink disabled:opacity-50 transition-opacity"
           >
             {loading ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}

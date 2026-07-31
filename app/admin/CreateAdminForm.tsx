@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 
-export default function CreateAdminForm({ onDone }: { onDone: () => void }) {
+export default function CreateAdminForm({
+  onDone,
+  onCreated,
+}: {
+  onDone: () => void;
+  onCreated?: () => void;
+}) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +35,7 @@ export default function CreateAdminForm({ onDone }: { onDone: () => void }) {
       setName("");
       setEmail("");
       setPassword("");
+      onCreated?.();
     } catch {
       setError("Network error — please try again.");
     } finally {

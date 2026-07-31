@@ -39,7 +39,13 @@ async function loadStore(): Promise<LoadedStore> {
   }
   const text = await new Response(result.stream).text();
   const data = JSON.parse(text) as StoreData;
-  return { data, etag: result.blob.etag };
+  // Vercel Blob can serve a weak validator (`W/"..."`) for this access tier,
+  // but `put`'s `ifMatch` precondition only ever succeeds against a strong
+  // one — sending the weak form back verbatim fails every single time, even
+  // with no real conflict. Strip the weak-validator prefix so CAS retries
+  // can actually succeed.
+  const etag = result.blob.etag.replace(/^W\//, "");
+  return { data, etag };
 }
 
 export async function readUsers(): Promise<UserRecord[]> {

@@ -15,7 +15,7 @@ const LINKS = [
 
 const TICKER_ITEMS = [
   "4 RIGS",
-  "2 DRIFT BAYS",
+  "2 DRIFT SIMULATORS",
   `${BUSINESS.googleRating}★ RATED`,
   `${BUSINESS.instagramFollowers} FOLLOWERS`,
   "NEW CAIRO",

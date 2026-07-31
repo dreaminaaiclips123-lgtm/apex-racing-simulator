@@ -35,7 +35,7 @@ export default function Modes() {
                       <h3 className="text-display text-2xl uppercase text-ink">{mode.label}</h3>
                       {mode.driftOnly && (
                         <span className="text-[10px] uppercase tracking-wide text-accent-2 border border-accent-2/40 rounded-full px-2 py-0.5">
-                          Bays 03 · 04 only
+                          Simulators 03 · 04 only
                         </span>
                       )}
                     </div>

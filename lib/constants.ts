@@ -58,12 +58,12 @@ export interface SimulatorRig {
   driftCapable: boolean;
 }
 
-// Bays 3 & 4 are the drift-tuned rigs — all 4 run F1 / Race / Highway.
+// Simulators 3 & 4 are the drift-tuned rigs — all 4 run F1 / Race / Highway.
 export const SIMULATORS: SimulatorRig[] = [
-  { id: 1, name: "BAY 01", driftCapable: false },
-  { id: 2, name: "BAY 02", driftCapable: false },
-  { id: 3, name: "BAY 03", driftCapable: true },
-  { id: 4, name: "BAY 04", driftCapable: true },
+  { id: 1, name: "SIMULATOR 01", driftCapable: false },
+  { id: 2, name: "SIMULATOR 02", driftCapable: false },
+  { id: 3, name: "SIMULATOR 03", driftCapable: true },
+  { id: 4, name: "SIMULATOR 04", driftCapable: true },
 ];
 
 export const PRICING = {

@@ -13,7 +13,7 @@ export default async function BookingSection() {
         <Reveal className="text-center max-w-xl mx-auto mb-12">
           <p className="text-accent-2 text-xs tracking-[0.4em] uppercase mb-4">Book now</p>
           <h2 className="text-display text-4xl md:text-5xl uppercase text-ink leading-[0.95]">
-            Lock in your bay
+            Lock in your simulator
           </h2>
           <p className="mt-5 text-ink-dim text-base md:text-lg">
             Real-time availability across all 4 rigs — book instantly, no phone

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { minutesToLabel, parseDateKey, type BookingRecord } from "@/lib/booking";
 import { MODES, SIMULATORS } from "@/lib/constants";
-import CreateAdminForm from "./CreateAdminForm";
+import AdminsPanel from "./AdminsPanel";
 
 function formatDayLabel(date: string): string {
   return parseDateKey(date).toLocaleDateString("en-GB", {
@@ -22,7 +22,7 @@ export default function AdminBookingsList({
 }) {
   const [pending, setPending] = useState<string | null>(null);
   const [items, setItems] = useState(bookings);
-  const [showCreateAdmin, setShowCreateAdmin] = useState(false);
+  const [showAdminsPanel, setShowAdminsPanel] = useState(false);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -56,10 +56,10 @@ export default function AdminBookingsList({
           <div className="flex flex-wrap items-center gap-3">
             {isSuperAdmin && (
               <button
-                onClick={() => setShowCreateAdmin((v) => !v)}
+                onClick={() => setShowAdminsPanel((v) => !v)}
                 className="text-sm text-ink-dim hover:text-ink border border-line rounded-md px-4 py-2 transition-colors"
               >
-                {showCreateAdmin ? "Cancel" : "Add admin"}
+                {showAdminsPanel ? "Close" : "Manage admins"}
               </button>
             )}
             <button
@@ -71,8 +71,8 @@ export default function AdminBookingsList({
           </div>
         </div>
 
-        {isSuperAdmin && showCreateAdmin && (
-          <CreateAdminForm onDone={() => setShowCreateAdmin(false)} />
+        {isSuperAdmin && showAdminsPanel && (
+          <AdminsPanel onDone={() => setShowAdminsPanel(false)} />
         )}
 
         {dates.length === 0 && (
@@ -107,7 +107,7 @@ export default function AdminBookingsList({
                         </td>
                         <td className="px-4 py-3">{MODES[b.mode].label}</td>
                         <td className="px-4 py-3">
-                          {SIMULATORS.find((s) => s.id === b.simId)?.name ?? `Bay ${b.simId}`}
+                          {SIMULATORS.find((s) => s.id === b.simId)?.name ?? `Simulator ${b.simId}`}
                         </td>
                         <td className="px-4 py-3">{b.customerName}</td>
                         <td className="px-4 py-3 tabular">

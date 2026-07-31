@@ -9,10 +9,10 @@ export default function SimulatorLineup() {
         <Reveal className="max-w-xl">
           <p className="text-accent-2 text-xs tracking-[0.4em] uppercase mb-4">The lineup</p>
           <h2 className="text-display text-4xl md:text-5xl uppercase text-ink leading-[0.95]">
-            4 bays. Your call.
+            4 simulators. Your call.
           </h2>
           <p className="mt-5 text-ink-dim text-base md:text-lg">
-            Every bay runs F1, Race and Highway. Bays 03 &amp; 04 are our drift-tuned
+            Every simulator runs F1, Race and Highway. Simulators 03 &amp; 04 are our drift-tuned
             rigs — book one specifically if sideways is the plan.
           </p>
         </Reveal>

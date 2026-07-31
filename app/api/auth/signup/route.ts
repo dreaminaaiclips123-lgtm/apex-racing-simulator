@@ -19,7 +19,14 @@ export async function POST(req: NextRequest) {
   const phone = typeof b.phone === "string" ? b.phone.trim().slice(0, 30) : "";
   const email = typeof b.email === "string" ? b.email.trim().toLowerCase() : "";
   const password = typeof b.password === "string" ? b.password : "";
+  const agreedToTerms = b.agreedToTerms === true;
 
+  if (!agreedToTerms) {
+    return NextResponse.json(
+      { error: "You must agree to the Terms of Service and Privacy Policy." },
+      { status: 400 }
+    );
+  }
   if (name.length < 2) {
     return NextResponse.json({ error: "Enter your name." }, { status: 400 });
   }

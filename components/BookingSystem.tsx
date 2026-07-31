@@ -168,16 +168,16 @@ export default function BookingSystem({ customerName }: { customerName: string |
     const waText = encodeURIComponent(
       `Hi Apex! Just booked ${MODES[confirmation.mode].label} on ${dateLabel} at ` +
         `${minutesToLabel(confirmation.startMinute)}–${minutesToLabel(confirmation.endMinute)} ` +
-        `(Bay ${String(confirmation.simId).padStart(2, "0")}). Name: ${customerName}.`
+        `(Simulator ${String(confirmation.simId).padStart(2, "0")}). Name: ${customerName}.`
     );
     return (
       <div className="rounded-xl border border-go/40 bg-go-dim p-8 md:p-12 text-center">
         <IconCircleCheckFilled size={48} className="text-go mx-auto" />
-        <h3 className="text-display text-3xl uppercase text-ink mt-4">Bay locked in</h3>
+        <h3 className="text-display text-3xl uppercase text-ink mt-4">Simulator locked in</h3>
         <p className="text-ink-dim mt-2">
           {MODES[confirmation.mode].label} · {dateLabel} ·{" "}
           {minutesToLabel(confirmation.startMinute)}–{minutesToLabel(confirmation.endMinute)} ·
-          Bay {String(confirmation.simId).padStart(2, "0")}
+          Simulator {String(confirmation.simId).padStart(2, "0")}
         </p>
         <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
           <a
@@ -252,7 +252,7 @@ export default function BookingSystem({ customerName }: { customerName: string |
             })}
           </div>
           {mode === "drift" && (
-            <p className="text-xs text-accent-2 mt-3">Only bays 03 &amp; 04 support drift.</p>
+            <p className="text-xs text-accent-2 mt-3">Only simulators 03 &amp; 04 support drift.</p>
           )}
         </div>
 
