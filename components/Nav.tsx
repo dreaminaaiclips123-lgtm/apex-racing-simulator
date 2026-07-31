@@ -7,10 +7,11 @@ import { IconMenu2, IconX } from "@tabler/icons-react";
 import { BUSINESS } from "@/lib/constants";
 
 const LINKS = [
-  { href: "#simulators", label: "Rigs" },
-  { href: "#modes", label: "Modes" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#location", label: "Find us" },
+  { href: "/#simulators", label: "Rigs" },
+  { href: "/#modes", label: "Modes" },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/about", label: "About" },
+  { href: "/#location", label: "Find us" },
 ];
 
 const TICKER_ITEMS = [
@@ -19,7 +20,7 @@ const TICKER_ITEMS = [
   `${BUSINESS.googleRating}★ RATED`,
   `${BUSINESS.instagramFollowers} FOLLOWERS`,
   "NEW CAIRO",
-  `OPEN ${BUSINESS.openHour}:00 – 00:00`,
+  `OPEN ${BUSINESS.openHour}:00 – ${String(BUSINESS.closeHour % 24).padStart(2, "0")}:00`,
 ];
 
 export interface NavSession {
@@ -104,7 +105,7 @@ export default function Nav({ session }: { session: NavSession | null }) {
               </button>
             )}
             <a
-              href="#book"
+              href="/#book"
               className="hidden sm:inline-flex items-center rounded-md bg-accent px-5 py-2.5 text-sm text-display uppercase tracking-wide text-ink hover:bg-ink hover:text-bg transition-colors"
             >
               Book a slot
@@ -151,7 +152,7 @@ export default function Nav({ session }: { session: NavSession | null }) {
             </button>
           )}
           <a
-            href="#book"
+            href="/#book"
             onClick={() => setOpen(false)}
             className="rounded-md bg-accent px-5 py-3 text-center text-display uppercase tracking-wide text-ink"
           >

@@ -28,8 +28,8 @@
   --animate-track: track-scroll 2.2s linear infinite;
 
   @keyframes track-scroll {
-    from { background-position: 0 0, 0 0; }
-    to { background-position: 0 64px, 0 0; }
+    from { transform: translateY(0); }
+    to { transform: translateY(64px); }
   }
 
   @keyframes flicker {

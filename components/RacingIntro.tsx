@@ -116,6 +116,9 @@ export default function RacingIntro() {
   return (
     <motion.div
       className="fixed inset-0 z-100 bg-bg overflow-hidden"
+      // Tap-to-skip: Escape is invisible on a touchscreen, so without this a
+      // slow/blocked video leaves a mobile visitor with no way out at all.
+      onClick={finish}
       animate={
         phase === "exiting" ? { opacity: 0, scale: 1.06 } : { opacity: 1, scale: 1 }
       }

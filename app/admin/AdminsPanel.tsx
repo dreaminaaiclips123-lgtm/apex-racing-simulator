@@ -88,29 +88,29 @@ export default function AdminsPanel({ onDone }: { onDone: () => void }) {
       ) : admins.length === 0 ? (
         <p className="text-ink-dim text-sm">No admin accounts yet.</p>
       ) : (
-        <div className="rounded-md border border-line overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-md border border-line overflow-x-auto">
+          <table className="w-full min-w-[540px] text-sm">
             <thead className="bg-surface text-ink-dim uppercase text-xs tracking-wide">
               <tr>
-                <th className="text-left px-4 py-2.5">Name</th>
-                <th className="text-left px-4 py-2.5">Email</th>
-                <th className="text-left px-4 py-2.5">Added</th>
+                <th className="text-left px-4 py-2.5 whitespace-nowrap">Name</th>
+                <th className="text-left px-4 py-2.5 whitespace-nowrap">Email</th>
+                <th className="text-left px-4 py-2.5 whitespace-nowrap">Added</th>
                 <th className="px-4 py-2.5" />
               </tr>
             </thead>
             <tbody>
               {admins.map((a) => (
                 <tr key={a.id} className="border-t border-line bg-surface">
-                  <td className="px-4 py-2.5">{a.name}</td>
-                  <td className="px-4 py-2.5">{a.email}</td>
-                  <td className="px-4 py-2.5 tabular">
+                  <td className="px-4 py-2.5 whitespace-nowrap">{a.name}</td>
+                  <td className="px-4 py-2.5 whitespace-nowrap">{a.email}</td>
+                  <td className="px-4 py-2.5 tabular whitespace-nowrap">
                     {new Date(a.createdAt).toLocaleDateString("en-GB", {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
                     })}
                   </td>
-                  <td className="px-4 py-2.5 text-right">
+                  <td className="px-4 py-2.5 text-right whitespace-nowrap">
                     {a.isSuperAdmin ? (
                       <span className="text-ink-faint text-xs uppercase tracking-wide">
                         Super admin

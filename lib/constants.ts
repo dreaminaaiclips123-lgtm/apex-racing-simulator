@@ -11,9 +11,9 @@ export const BUSINESS = {
   phoneDisplay: "011 1041 4102",
   phoneTel: "+201110414102",
   whatsappNumber: "+201212040789",
-  // Assumed from typical New Cairo entertainment-venue hours — confirm/correct with owner.
-  openHour: 10,
-  closeHour: 24,
+  // Confirmed by owner: open midday, close 2am (closeHour > 24 = past midnight).
+  openHour: 12,
+  closeHour: 26,
 } as const;
 
 export const SLOT_MINUTES = 30;

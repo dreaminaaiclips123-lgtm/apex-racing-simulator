@@ -34,7 +34,7 @@ export default function LocationContact() {
               <div>
                 <p className="text-ink">Open every day</p>
                 <p className="text-sm text-ink-dim mt-0.5 tabular">
-                  {BUSINESS.openHour}:00 — 00:00
+                  {BUSINESS.openHour}:00 — {String(BUSINESS.closeHour % 24).padStart(2, "0")}:00
                 </p>
               </div>
             </div>

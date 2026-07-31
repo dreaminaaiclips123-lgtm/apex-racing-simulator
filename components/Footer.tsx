@@ -72,10 +72,10 @@ export default function Footer() {
           </p>
           <p className="text-sm text-ink">Every day</p>
           <p className="text-sm text-ink-dim tabular">
-            {BUSINESS.openHour}:00 — 00:00
+            {BUSINESS.openHour}:00 — {String(BUSINESS.closeHour % 24).padStart(2, "0")}:00
           </p>
           <a
-            href="#book"
+            href="/#book"
             className="inline-block mt-5 rounded-md bg-accent px-5 py-2.5 text-sm text-display uppercase tracking-wide text-ink hover:bg-ink hover:text-bg transition-colors"
           >
             Book a slot

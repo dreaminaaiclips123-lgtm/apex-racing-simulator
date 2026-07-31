@@ -78,14 +78,14 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
             No upcoming bookings yet.
           </p>
         ) : (
-          <div className="rounded-lg border border-line overflow-hidden mb-10">
-            <table className="w-full text-sm">
+          <div className="rounded-lg border border-line overflow-x-auto mb-10">
+            <table className="w-full min-w-[560px] text-sm">
               <thead className="bg-surface text-ink-dim uppercase text-xs tracking-wide">
                 <tr>
-                  <th className="text-left px-4 py-3">Date</th>
-                  <th className="text-left px-4 py-3">Time</th>
-                  <th className="text-left px-4 py-3">Mode</th>
-                  <th className="text-left px-4 py-3">Rig</th>
+                  <th className="text-left px-4 py-3 whitespace-nowrap">Date</th>
+                  <th className="text-left px-4 py-3 whitespace-nowrap">Time</th>
+                  <th className="text-left px-4 py-3 whitespace-nowrap">Mode</th>
+                  <th className="text-left px-4 py-3 whitespace-nowrap">Rig</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -94,15 +94,15 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
                   const cancellable = now < bookingStartDate(b.date, b.startMinute).getTime() - CANCEL_CUTOFF_MS;
                   return (
                     <tr key={b.id} className="border-t border-line bg-surface-2">
-                      <td className="px-4 py-3">{formatDayLabel(b.date)}</td>
-                      <td className="px-4 py-3 tabular">
+                      <td className="px-4 py-3 whitespace-nowrap">{formatDayLabel(b.date)}</td>
+                      <td className="px-4 py-3 tabular whitespace-nowrap">
                         {minutesToLabel(b.startMinute)}–{minutesToLabel(b.endMinute)}
                       </td>
-                      <td className="px-4 py-3">{MODES[b.mode].label}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">{MODES[b.mode].label}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         {SIMULATORS.find((s) => s.id === b.simId)?.name ?? `Simulator ${b.simId}`}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
                         {cancellable ? (
                           <button
                             onClick={() => cancel(b.id)}
@@ -128,25 +128,25 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
         {past.length > 0 && (
           <>
             <h2 className="text-display text-lg text-ink-dim uppercase tracking-wide mb-3">Past</h2>
-            <div className="rounded-lg border border-line overflow-hidden opacity-70">
-              <table className="w-full text-sm">
+            <div className="rounded-lg border border-line overflow-x-auto opacity-70">
+              <table className="w-full min-w-[480px] text-sm">
                 <thead className="bg-surface text-ink-dim uppercase text-xs tracking-wide">
                   <tr>
-                    <th className="text-left px-4 py-3">Date</th>
-                    <th className="text-left px-4 py-3">Time</th>
-                    <th className="text-left px-4 py-3">Mode</th>
-                    <th className="text-left px-4 py-3">Rig</th>
+                    <th className="text-left px-4 py-3 whitespace-nowrap">Date</th>
+                    <th className="text-left px-4 py-3 whitespace-nowrap">Time</th>
+                    <th className="text-left px-4 py-3 whitespace-nowrap">Mode</th>
+                    <th className="text-left px-4 py-3 whitespace-nowrap">Rig</th>
                   </tr>
                 </thead>
                 <tbody>
                   {past.map((b) => (
                     <tr key={b.id} className="border-t border-line bg-surface-2">
-                      <td className="px-4 py-3">{formatDayLabel(b.date)}</td>
-                      <td className="px-4 py-3 tabular">
+                      <td className="px-4 py-3 whitespace-nowrap">{formatDayLabel(b.date)}</td>
+                      <td className="px-4 py-3 tabular whitespace-nowrap">
                         {minutesToLabel(b.startMinute)}–{minutesToLabel(b.endMinute)}
                       </td>
-                      <td className="px-4 py-3">{MODES[b.mode].label}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">{MODES[b.mode].label}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         {SIMULATORS.find((s) => s.id === b.simId)?.name ?? `Simulator ${b.simId}`}
                       </td>
                     </tr>

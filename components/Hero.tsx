@@ -19,9 +19,13 @@ export default function Hero() {
     >
       {/* perspective track-grid horizon, ambient — pauses under prefers-reduced-motion globally */}
       <div className="absolute inset-0 [perspective:300px] overflow-hidden">
-        <div className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(78deg)] opacity-25">
+        <div className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(78deg)] opacity-25 overflow-hidden">
+          {/* Extends 64px above its box and translates by exactly one tile
+              (transform, not background-position) so the loop is GPU-composited
+              instead of repainting every frame — background-position animation
+              was a real source of scroll jank on mobile. */}
           <div
-            className="h-full w-full animate-track"
+            className="absolute inset-x-0 -top-16 h-[calc(100%+64px)] animate-track"
             style={{
               backgroundImage:
                 "repeating-linear-gradient(90deg, var(--color-ink) 0 1px, transparent 1px 64px), repeating-linear-gradient(0deg, var(--color-ink) 0 2px, transparent 2px 64px)",
