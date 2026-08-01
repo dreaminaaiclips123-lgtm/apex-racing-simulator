@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { motion } from "motion/react";
 import { IconFlagFilled } from "@tabler/icons-react";
-import { INTRO_SEEN_COOKIE } from "@/lib/introCookie";
+import { INTRO_SEEN_COOKIE, INTRO_SEEN_MAX_AGE_S } from "@/lib/introCookie";
 
 const LOADING_TIMEOUT_MS = 4500;
 const EXIT_DURATION_S = 0.7;
 
 // The root layout only mounts this component at all when the server-side
-// cookie check says the intro hasn't been seen this session — see
+// cookie check says the intro hasn't been seen in the last 24h — see
 // app/layout.tsx. That means this component itself never needs to ask "have
 // I already played?"; it can assume the answer is no the moment it mounts.
 type Phase = "loading" | "playing" | "exiting" | "done";
@@ -31,10 +31,12 @@ function useReducedMotion(): boolean {
 }
 
 function markIntroSeen() {
-  // Plain session cookie (no Max-Age): cleared when the browser fully
-  // quits, read server-side on the next request to decide whether to
-  // mount this component at all.
-  document.cookie = `${INTRO_SEEN_COOKIE}=1; path=/`;
+  // 24h Max-Age (not a bare session cookie): a session cookie's real
+  // lifetime is at the mercy of each browser's tab-restore/"continue where
+  // you left off" behavior, which made this look "stuck forever seen" or
+  // "randomly resets" depending on the browser — a fixed 24h window is
+  // predictable and testable regardless of browser quirks.
+  document.cookie = `${INTRO_SEEN_COOKIE}=1; path=/; max-age=${INTRO_SEEN_MAX_AGE_S}`;
 }
 
 export default function RacingIntro() {
@@ -118,7 +120,13 @@ export default function RacingIntro() {
       className="fixed inset-0 z-100 bg-bg overflow-hidden"
       // Tap-to-skip: Escape is invisible on a touchscreen, so without this a
       // slow/blocked video leaves a mobile visitor with no way out at all.
-      onClick={finish}
+      // Only armed once we know the video is actually playing (or in the
+      // reduced-motion static fallback) — the video is pointer-events-none,
+      // so during "loading" any click (including an attempt to hit a
+      // browser's own blocked-autoplay play button) passes straight through
+      // to this handler; arming it that early skipped the intro on the very
+      // first click before the video ever got a chance to start.
+      onClick={phase === "playing" || reducedMotion ? finish : undefined}
       animate={
         phase === "exiting" ? { opacity: 0, scale: 1.06 } : { opacity: 1, scale: 1 }
       }
