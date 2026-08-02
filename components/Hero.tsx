@@ -26,18 +26,29 @@ export default function Hero() {
           (horizon) and both left/right edges equally; nothing shows through
           except the oval itself, so there's no hard edge or asymmetry left
           to expose. */}
-      {/* perspective in vw, not a fixed px value: a fixed 300px perspective
-          distance is only "300px deep" relative to whatever the viewport
-          happens to be — on a wide screen that's an extremely shallow ratio,
-          causing severe distortion that compresses the plane's edges down
-          to almost nothing. Since the *layout* viewport (window.innerWidth)
-          shrinks under browser page-zoom, the same fixed 300px becomes
-          proportionally deeper at higher zoom — which is exactly why
-          zooming in made more of the grid "reappear". Scaling perspective
-          with viewport width keeps the distortion consistent regardless of
-          viewport size or zoom level. */}
-      <div className="absolute inset-0 [perspective:30vw] overflow-hidden">
-        <div className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(78deg)] opacity-25 overflow-hidden">
+      {/* ROOT CAUSE of the long-running "grid disappears until I zoom in" bug:
+          sub-pixel rasterization. rotateX + perspective foreshortens the plane,
+          so a hairline 1px grid line gets scaled *down* with depth. Measured
+          with the old values (perspective:30vw, rotateX:78deg), lines fell to
+          0.39x scale at the far end — 0.39 device px on a DPR-1 monitor — and
+          then got multiplied by opacity-25, leaving ~10% pixel coverage against
+          a near-black background. The rasterizer discards that, so the grid is
+          simply not painted. Browser zoom raises the device-pixel budget for
+          the same CSS px, pushing those lines back over the 1-device-px
+          threshold, which is exactly why zooming made it reappear.
+
+          Fix is dimensional, not cosmetic: keep every line >= 1 device px even
+          at maximum depth on a DPR-1 screen.
+            - perspective 30vw -> 55vw and rotateX 78 -> 74deg, so the worst-case
+              depth scale rises from 0.39 to ~0.55
+            - line width 1px/2px -> 3px, so worst case is 3 * 0.55 ~= 1.6 device
+              px (was 0.39) — comfortably above the threshold
+            - opacity 0.25 -> 0.4 to restore the intended look now that the
+              lines are no longer being silently thinned away
+          Tile size stays 64px so the animation still translates exactly one
+          tile per loop. */}
+      <div className="absolute inset-0 [perspective:55vw] overflow-hidden">
+        <div className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(74deg)] opacity-40 overflow-hidden">
           {/* Extends 64px above its box and translates by exactly one tile
               (transform, not background-position) so the loop is GPU-composited
               instead of repainting every frame — background-position animation
@@ -46,7 +57,7 @@ export default function Hero() {
             className="absolute inset-x-0 -top-16 h-[calc(100%+64px)] animate-track"
             style={{
               backgroundImage:
-                "repeating-linear-gradient(90deg, var(--color-ink) 0 1px, transparent 1px 64px), repeating-linear-gradient(0deg, var(--color-ink) 0 2px, transparent 2px 64px)",
+                "repeating-linear-gradient(90deg, var(--color-ink) 0 3px, transparent 3px 64px), repeating-linear-gradient(0deg, var(--color-ink) 0 3px, transparent 3px 64px)",
               backgroundSize: "64px 64px, 100% 64px",
             }}
           />
