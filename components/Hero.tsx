@@ -26,7 +26,17 @@ export default function Hero() {
           (horizon) and both left/right edges equally; nothing shows through
           except the oval itself, so there's no hard edge or asymmetry left
           to expose. */}
-      <div className="absolute inset-0 [perspective:300px] overflow-hidden">
+      {/* perspective in vw, not a fixed px value: a fixed 300px perspective
+          distance is only "300px deep" relative to whatever the viewport
+          happens to be — on a wide screen that's an extremely shallow ratio,
+          causing severe distortion that compresses the plane's edges down
+          to almost nothing. Since the *layout* viewport (window.innerWidth)
+          shrinks under browser page-zoom, the same fixed 300px becomes
+          proportionally deeper at higher zoom — which is exactly why
+          zooming in made more of the grid "reappear". Scaling perspective
+          with viewport width keeps the distortion consistent regardless of
+          viewport size or zoom level. */}
+      <div className="absolute inset-0 [perspective:30vw] overflow-hidden">
         <div className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(78deg)] opacity-25 overflow-hidden">
           {/* Extends 64px above its box and translates by exactly one tile
               (transform, not background-position) so the loop is GPU-composited
