@@ -77,22 +77,6 @@ export default function RacingIntro() {
     timers.current.push(setTimeout(() => setPhase("done"), EXIT_DURATION_S * 1000));
   }
 
-  // A real user gesture can always start playback, regardless of whatever
-  // autoplay policy blocked the automatic attempt — so a tap while still
-  // "loading" tries to force the video to actually start, rather than
-  // skipping it outright. The video is pointer-events-none, so a tap never
-  // reaches any native play button the browser might have drawn over it;
-  // this is the only way a blocked-autoplay visitor can ever get it moving.
-  function handleTap() {
-    if (reducedMotion || phaseRef.current === "playing") {
-      finish();
-      return;
-    }
-    if (phaseRef.current === "loading") {
-      videoRef.current?.play().catch(() => {});
-    }
-  }
-
   // Schedules the timer for whichever opening state we're in. Purely a side
   // effect — never decides `phase` synchronously in here.
   useEffect(() => {
@@ -129,47 +113,16 @@ export default function RacingIntro() {
     };
   }, [phase]);
 
-  // Escape skips, as a hidden accessibility fallback.
-  useEffect(() => {
-    if (phase !== "loading" && phase !== "playing") return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") finish();
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [phase]);
-
   if (phase === "done") return null;
 
   return (
     <motion.div
       className="fixed inset-0 z-100 bg-bg overflow-hidden"
-      // Tap anywhere: forces playback if autoplay got blocked (a real user
-      // gesture is always allowed to start a video, no exceptions), or skips
-      // if it's already playing. Escape remains a hidden keyboard fallback,
-      // but touchscreens have no Escape key at all.
-      onClick={handleTap}
       animate={
         phase === "exiting" ? { opacity: 0, scale: 1.06 } : { opacity: 1, scale: 1 }
       }
       transition={{ duration: EXIT_DURATION_S, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Real focusable control, not just the hidden Escape-key fallback —
-          a keyboard or screen-reader visitor had no discoverable way to skip
-          this before. stopPropagation so it doesn't also trigger handleTap
-          on the overlay behind it. */}
-      {!reducedMotion && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            finish();
-          }}
-          className="absolute bottom-6 right-6 z-10 rounded-md border border-line bg-bg/60 px-4 py-2 text-xs uppercase tracking-wide text-ink-dim backdrop-blur hover:text-ink hover:border-ink transition-colors"
-        >
-          Skip intro
-        </button>
-      )}
       {reducedMotion ? (
         <motion.div
           className="h-full w-full flex flex-col items-center justify-center gap-3"
