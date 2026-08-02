@@ -25,8 +25,14 @@ export default function Hero() {
         <div
           className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(78deg)] opacity-25 overflow-hidden"
           style={{
-            maskImage: "radial-gradient(75% 100% at 50% 100%, black 30%, transparent 88%)",
-            WebkitMaskImage: "radial-gradient(75% 100% at 50% 100%, black 30%, transparent 88%)",
+            // Sized in vw, not %: the box this mask paints on is 200vw wide
+            // (inset-x-[-50%] on purpose, for perspective headroom), so a
+            // percentage-based radius here is a percentage of 200vw, not of
+            // the viewport — a "75%" radius was actually 150vw, which barely
+            // reached the visible ±50vw window at all and left the right
+            // side effectively unmasked/untouched (looked "missing" there).
+            maskImage: "radial-gradient(60vw 100% at 50% 100%, black 55%, transparent 100%)",
+            WebkitMaskImage: "radial-gradient(60vw 100% at 50% 100%, black 55%, transparent 100%)",
           }}
         >
           {/* Extends 64px above its box and translates by exactly one tile

@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
               "media-src 'self'",
               "font-src 'self' data:",
               "connect-src 'self'",
+              // The location section embeds a Google Maps iframe — without an
+              // explicit frame-src, CSP falls back to default-src 'self' and
+              // silently blocks it (this actually broke the map after the
+              // headers were first added).
+              "frame-src https://www.google.com",
               "frame-ancestors 'none'",
             ].join("; "),
           },
