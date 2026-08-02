@@ -51,11 +51,20 @@ export default function Hero() {
             }}
           />
         </div>
+        {/* Horizon fade. Deliberately a *wide* ellipse (140% horizontal
+            radius): the fade wanted here is depth — the plane receding to
+            the horizon — not a left/right vignette. An earlier 65% radius
+            put the screen edges ~77% of the way into the opaque stop, which
+            combined with the grid's own opacity-25 left the edges at ~6%
+            effective visibility, i.e. the "missing right side". With a 140%
+            radius the screen edges sit at ~36% — inside the transparent
+            stop — so the sides stay fully visible and only the horizon
+            fades. */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 65% 65% at 50% 100%, transparent 25%, var(--color-bg) 92%)",
+              "radial-gradient(ellipse 140% 85% at 50% 100%, transparent 55%, var(--color-bg) 100%)",
           }}
         />
       </div>
