@@ -14,9 +14,21 @@ export default function Hero() {
       id="top"
       className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-bg pt-28 pb-12"
     >
-      {/* perspective track-grid horizon, ambient — pauses under prefers-reduced-motion globally */}
+      {/* perspective track-grid horizon, ambient — pauses under prefers-reduced-motion globally.
+          The rotated plane's own edges are hard rectangle boundaries — without
+          a mask the grid just starts abruptly mid-screen and any edge/tiling
+          seam shows as a visible cut, worst on the right. A radial mask
+          anchored at the bottom-center fades it out toward the top (so it
+          reads as receding into the distance, not popping in) and toward
+          both left/right edges at once (so there's no hard edge to see). */}
       <div className="absolute inset-0 [perspective:300px] overflow-hidden">
-        <div className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(78deg)] opacity-25 overflow-hidden">
+        <div
+          className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(78deg)] opacity-25 overflow-hidden"
+          style={{
+            maskImage: "radial-gradient(75% 100% at 50% 100%, black 30%, transparent 88%)",
+            WebkitMaskImage: "radial-gradient(75% 100% at 50% 100%, black 30%, transparent 88%)",
+          }}
+        >
           {/* Extends 64px above its box and translates by exactly one tile
               (transform, not background-position) so the loop is GPU-composited
               instead of repainting every frame — background-position animation
