@@ -15,26 +15,19 @@ export default function Hero() {
       className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-bg pt-28 pb-12"
     >
       {/* perspective track-grid horizon, ambient — pauses under prefers-reduced-motion globally.
-          The rotated plane's own edges are hard rectangle boundaries — without
-          a mask the grid just starts abruptly mid-screen and any edge/tiling
-          seam shows as a visible cut, worst on the right. A radial mask
-          anchored at the bottom-center fades it out toward the top (so it
-          reads as receding into the distance, not popping in) and toward
-          both left/right edges at once (so there's no hard edge to see). */}
+          The rotated plane's own edges are hard rectangle boundaries. A prior
+          attempt to hide that with mask-image on the 3D-transformed element
+          itself was unreliable — mask-image + perspective/rotateX doesn't
+          composite consistently across browsers, and the visible result
+          varied. Fixed properly with a flat, non-transformed vignette overlay
+          instead: a plain radial-gradient div, painted *after* the grid in
+          normal 2D space, with zero dependency on how the 3D layer beneath
+          it rendered. Solid --color-bg outside the oval hides the top edge
+          (horizon) and both left/right edges equally; nothing shows through
+          except the oval itself, so there's no hard edge or asymmetry left
+          to expose. */}
       <div className="absolute inset-0 [perspective:300px] overflow-hidden">
-        <div
-          className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(78deg)] opacity-25 overflow-hidden"
-          style={{
-            // Sized in vw, not %: the box this mask paints on is 200vw wide
-            // (inset-x-[-50%] on purpose, for perspective headroom), so a
-            // percentage-based radius here is a percentage of 200vw, not of
-            // the viewport — a "75%" radius was actually 150vw, which barely
-            // reached the visible ±50vw window at all and left the right
-            // side effectively unmasked/untouched (looked "missing" there).
-            maskImage: "radial-gradient(60vw 100% at 50% 100%, black 55%, transparent 100%)",
-            WebkitMaskImage: "radial-gradient(60vw 100% at 50% 100%, black 55%, transparent 100%)",
-          }}
-        >
+        <div className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(78deg)] opacity-25 overflow-hidden">
           {/* Extends 64px above its box and translates by exactly one tile
               (transform, not background-position) so the loop is GPU-composited
               instead of repainting every frame — background-position animation
@@ -48,7 +41,13 @@ export default function Hero() {
             }}
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-bg via-bg/40 to-bg" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 65% 65% at 50% 100%, transparent 25%, var(--color-bg) 92%)",
+          }}
+        />
       </div>
 
       <div

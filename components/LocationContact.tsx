@@ -74,11 +74,17 @@ export default function LocationContact() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <div className="rounded-lg border border-line overflow-hidden h-[420px] lg:h-full lg:min-h-[480px]">
+          {/* `relative` + `absolute inset-0` on the iframe, not h-full: a
+              plain height:100% needs a *definite* ancestor height, and
+              min-h-[480px] (plus items-start on the parent grid, which
+              disables stretch) doesn't count as one — the iframe fell back
+              to its unstyled intrinsic default (300x150), rendering in the
+              corner with the rest of the box blank. */}
+          <div className="relative rounded-lg border border-line overflow-hidden h-[420px] lg:h-full lg:min-h-[480px]">
             <iframe
               title="Apex Racing Simulator location"
               src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
-              className="w-full h-full grayscale invert-[92%] contrast-[90%]"
+              className="absolute inset-0 w-full h-full grayscale invert-[92%] contrast-[90%]"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
