@@ -6,6 +6,7 @@ import { BUSINESS } from "@/lib/constants";
 export const metadata: Metadata = {
   title: `About Us — ${BUSINESS.name}`,
   description: `Meet the founders and leadership behind ${BUSINESS.name}.`,
+  alternates: { canonical: "/about" },
 };
 
 const TEAM = [

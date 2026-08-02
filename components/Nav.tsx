@@ -49,11 +49,14 @@ export default function Nav({ session }: { session: NavSession | null }) {
 
   return (
     <header className="fixed top-0 inset-x-0 z-50">
-      <div className="hidden md:block overflow-hidden border-b border-line bg-bg/95 text-[11px] tracking-[0.25em] text-ink-faint">
+      <div
+        aria-hidden="true"
+        className="hidden md:block overflow-hidden border-b border-line bg-bg/95 text-[11px] tracking-[0.25em] text-ink-faint"
+      >
         <div className="flex animate-marquee whitespace-nowrap py-1.5">
           {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
             <span key={i} className="mx-6 flex items-center gap-2">
-              <span className="h-1 w-1 rounded-full bg-accent" />
+              <span className="h-1 w-1 rounded-full bg-accent-btn" />
               {item}
             </span>
           ))}
@@ -72,7 +75,6 @@ export default function Nav({ session }: { session: NavSession | null }) {
               alt="Apex Racing Simulator"
               width={350}
               height={100}
-              priority
               className="h-7 w-auto"
             />
           </Link>
@@ -106,7 +108,7 @@ export default function Nav({ session }: { session: NavSession | null }) {
             )}
             <a
               href="/#book"
-              className="hidden sm:inline-flex items-center rounded-md bg-accent px-5 py-2.5 text-sm text-display uppercase tracking-wide text-ink hover:bg-ink hover:text-bg transition-colors"
+              className="hidden sm:inline-flex items-center rounded-md bg-accent-btn px-5 py-2.5 text-sm text-display uppercase tracking-wide text-ink hover:bg-ink hover:text-bg transition-colors"
             >
               Book a slot
             </a>
@@ -114,6 +116,8 @@ export default function Nav({ session }: { session: NavSession | null }) {
               onClick={() => setOpen((v) => !v)}
               className="md:hidden text-ink p-2"
               aria-label="Toggle menu"
+              aria-expanded={open}
+              aria-controls="mobile-menu"
             >
               {open ? <IconX size={22} /> : <IconMenu2 size={22} />}
             </button>
@@ -122,7 +126,7 @@ export default function Nav({ session }: { session: NavSession | null }) {
       </div>
 
       {open && (
-        <div className="md:hidden bg-bg border-b border-line px-6 py-4 flex flex-col gap-4">
+        <div id="mobile-menu" className="md:hidden bg-bg border-b border-line px-6 py-4 flex flex-col gap-4">
           {LINKS.map((l) => (
             <a
               key={l.href}
@@ -154,7 +158,7 @@ export default function Nav({ session }: { session: NavSession | null }) {
           <a
             href="/#book"
             onClick={() => setOpen(false)}
-            className="rounded-md bg-accent px-5 py-3 text-center text-display uppercase tracking-wide text-ink"
+            className="rounded-md bg-accent-btn px-5 py-3 text-center text-display uppercase tracking-wide text-ink"
           >
             Book a slot
           </a>

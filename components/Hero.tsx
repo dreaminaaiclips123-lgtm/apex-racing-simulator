@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "motion/react";
 import { IconStarFilled } from "@tabler/icons-react";
 import { BUSINESS } from "@/lib/constants";
 
@@ -42,45 +39,40 @@ export default function Hero() {
       />
 
       <div className="relative mx-auto w-full max-w-5xl px-6 md:px-10 text-center">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-accent-2 text-xs md:text-sm tracking-[0.4em] uppercase mb-5"
+        <p
+          className="animate-fade-in-up text-accent-2 text-xs md:text-sm tracking-[0.4em] uppercase mb-5"
+          style={{ animationDelay: "0s" }}
         >
           Where New Cairo Comes To Race
-        </motion.p>
+        </p>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-display text-[clamp(2.75rem,9vw,6.5rem)] leading-[0.92] uppercase text-ink"
-        >
+        {/* Plain element, not motion.h1 — this is the page's LCP candidate.
+            Framer Motion server-renders `initial` as inline opacity:0, and
+            Chrome's LCP algorithm excludes zero-opacity elements from being
+            recorded at all, so LCP ends up tied to hydration time instead of
+            first paint. It's the largest thing on screen; it should just be
+            there immediately. */}
+        <h1 className="text-display text-[clamp(2.75rem,9vw,6.5rem)] leading-[0.92] uppercase text-ink">
           Feel the
           <br />
           <span className="text-accent">Apex</span>
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-6 max-w-xl mx-auto text-ink-dim text-base md:text-lg"
+        <p
+          className="animate-fade-in-up mt-6 max-w-xl mx-auto text-ink-dim text-base md:text-lg"
+          style={{ animationDelay: "0.2s" }}
         >
           {BUSINESS.tagline}. Four pro-grade rigs, real racing feel, zero waiting
           on hold. Pick F1, Drift, Highway or Race — and lock your simulator in.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-4"
+        <div
+          className="animate-fade-in-up mt-9 flex flex-col sm:flex-row items-center justify-center gap-4"
+          style={{ animationDelay: "0.3s" }}
         >
           <a
             href="#book"
-            className="w-full sm:w-auto rounded-md bg-accent px-8 py-4 text-display uppercase tracking-wide text-ink hover:bg-ink hover:text-bg transition-colors"
+            className="w-full sm:w-auto rounded-md bg-accent-btn px-8 py-4 text-display uppercase tracking-wide text-ink hover:bg-ink hover:text-bg transition-colors"
           >
             Book a slot
           </a>
@@ -90,13 +82,11 @@ export default function Hero() {
           >
             See the rigs
           </a>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.45 }}
-          className="mt-14 max-w-2xl mx-auto border-t border-line pt-6"
+        <div
+          className="animate-fade-in-up mt-14 max-w-2xl mx-auto"
+          style={{ animationDelay: "0.45s" }}
         >
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-4">
             {STATS.map((s) => (
@@ -113,7 +103,7 @@ export default function Hero() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

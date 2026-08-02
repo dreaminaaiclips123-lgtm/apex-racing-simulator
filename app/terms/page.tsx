@@ -5,6 +5,7 @@ import { BUSINESS } from "@/lib/constants";
 export const metadata: Metadata = {
   title: `Terms of Service — ${BUSINESS.name}`,
   description: `Terms of Service for booking and using ${BUSINESS.name}.`,
+  alternates: { canonical: "/terms" },
 };
 
 const LAST_UPDATED = "31 July 2026";

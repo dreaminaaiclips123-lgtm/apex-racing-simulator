@@ -4,8 +4,17 @@ import { findUserByEmail, withUsersTransaction, type UserRecord } from "@/lib/us
 import { hashPassword } from "@/lib/password";
 import { createSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/session";
 import { isValidDob, isValidEmail, isValidPhone } from "@/lib/validation";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
+  const { limited, retryAfterMs } = await checkRateLimit(`signup:${clientIp(req)}`);
+  if (limited) {
+    return NextResponse.json(
+      { error: "Too many attempts — please wait a few minutes and try again." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(retryAfterMs / 1000)) } }
+    );
+  }
+
   let body: unknown;
   try {
     body = await req.json();

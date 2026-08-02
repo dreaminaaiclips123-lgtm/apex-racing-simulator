@@ -33,10 +33,13 @@ export const metadata: Metadata = {
     "drift simulator Egypt",
     "Apex Racing Simulator",
   ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: BUSINESS.name,
     description: BUSINESS.tagline,
-    url: BUSINESS.instagramUrl,
+    url: "/",
     siteName: BUSINESS.name,
     locale: "en_US",
     type: "website",
@@ -45,6 +48,38 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: BUSINESS.name,
     description: BUSINESS.tagline,
+  },
+};
+
+// Deliberately omits aggregateRating — Google requires a real reviewCount
+// alongside ratingValue, and we only have the rating itself, not a review
+// count we can stand behind. Fabricating one would be worse than omitting it.
+const businessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SportsActivityLocation",
+  name: BUSINESS.name,
+  description: BUSINESS.tagline,
+  url: "https://apex-racing-simulator.vercel.app",
+  telephone: BUSINESS.phoneTel,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: BUSINESS.addressShort,
+    addressLocality: BUSINESS.city,
+    addressCountry: "EG",
+  },
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ],
+    opens: `${String(BUSINESS.openHour).padStart(2, "0")}:00`,
+    closes: `${String(BUSINESS.closeHour % 24).padStart(2, "0")}:00`,
   },
 };
 
@@ -66,6 +101,11 @@ export default async function RootLayout({
       className={`${rajdhani.variable} ${titillium.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg">
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd) }}
+        />
         {/* Gated server-side (not just client-side sessionStorage): the server
             must never emit the video/poster markup for a returning-within-
             session visitor, or the browser paints the poster natively before

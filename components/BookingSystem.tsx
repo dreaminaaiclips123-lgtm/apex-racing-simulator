@@ -215,7 +215,7 @@ export default function BookingSystem({ customerName }: { customerName: string |
               onClick={() => selectDate(d.key)}
               className={`shrink-0 rounded-md px-4 py-3 text-center min-w-[64px] border transition-colors ${
                 date === d.key
-                  ? "bg-accent border-accent text-ink"
+                  ? "bg-accent-btn border-accent text-ink"
                   : "border-line text-ink-dim hover:text-ink hover:border-ink-dim"
               }`}
             >
@@ -241,7 +241,7 @@ export default function BookingSystem({ customerName }: { customerName: string |
                   onClick={() => selectMode(key)}
                   className={`rounded-md border px-3 py-3.5 flex flex-col items-center gap-1.5 transition-colors ${
                     active
-                      ? "bg-accent border-accent text-ink"
+                      ? "bg-accent-btn border-accent text-ink"
                       : "border-line text-ink-dim hover:text-ink hover:border-ink-dim"
                   }`}
                 >
@@ -265,7 +265,7 @@ export default function BookingSystem({ customerName }: { customerName: string |
                 onClick={() => selectDuration(d)}
                 className={`rounded-md border px-5 py-3.5 text-center transition-colors ${
                   duration === d
-                    ? "bg-accent border-accent text-ink"
+                    ? "bg-accent-btn border-accent text-ink"
                     : "border-line text-ink-dim hover:text-ink hover:border-ink-dim"
                 }`}
               >
@@ -289,7 +289,7 @@ export default function BookingSystem({ customerName }: { customerName: string |
         )}
 
         {!loadingSlots && slotsError && (
-          <div className="flex items-center gap-2 text-stop py-8 justify-center text-sm">
+          <div role="alert" aria-live="assertive" className="flex items-center gap-2 text-stop py-8 justify-center text-sm">
             <IconAlertTriangle size={18} />
             {slotsError}
           </div>
@@ -308,7 +308,7 @@ export default function BookingSystem({ customerName }: { customerName: string |
                   onClick={() => setStartMinute(slot.startMinute)}
                   className={`rounded-md border px-2 py-2.5 text-center tabular text-sm transition-colors ${
                     selected
-                      ? "bg-accent border-accent text-ink"
+                      ? "bg-accent-btn border-accent text-ink"
                       : disabled
                         ? "border-line/60 text-ink-faint line-through cursor-not-allowed"
                         : "border-go/40 text-ink hover:border-go hover:bg-go-dim"
@@ -344,7 +344,7 @@ export default function BookingSystem({ customerName }: { customerName: string |
               <button
                 onClick={confirmBooking}
                 disabled={submitting}
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3 text-display uppercase tracking-wide text-ink disabled:opacity-40 transition-opacity"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-accent-btn px-6 py-3 text-display uppercase tracking-wide text-ink disabled:opacity-40 transition-opacity"
               >
                 {submitting ? (
                   <IconLoader2 size={18} className="animate-spin" />
@@ -357,7 +357,7 @@ export default function BookingSystem({ customerName }: { customerName: string |
             ) : (
               <a
                 href={`/login?returnTo=${encodeURIComponent("/#book")}`}
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3 text-display uppercase tracking-wide text-ink"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-accent-btn px-6 py-3 text-display uppercase tracking-wide text-ink"
               >
                 Sign in to book <IconArrowRight size={16} />
               </a>
@@ -367,7 +367,7 @@ export default function BookingSystem({ customerName }: { customerName: string |
             <p className="text-xs text-ink-faint mt-3">Booking as {customerName}.</p>
           )}
           {submitError && (
-            <p className="flex items-center gap-2 text-stop text-sm mt-3">
+            <p role="alert" aria-live="assertive" className="flex items-center gap-2 text-stop text-sm mt-3">
               <IconAlertTriangle size={16} />
               {submitError}
             </p>

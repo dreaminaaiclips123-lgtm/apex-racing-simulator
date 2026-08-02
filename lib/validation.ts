@@ -3,7 +3,10 @@ export function isValidEmail(email: string): boolean {
 }
 
 export function isValidPhone(phone: string): boolean {
-  return /^[\d+\s-]{8,20}$/.test(phone);
+  if (!/^[\d+\s-]{8,20}$/.test(phone)) return false;
+  // The character-class check above accepts things like "--------" — require
+  // a real minimum count of actual digits too.
+  return phone.replace(/\D/g, "").length >= 7;
 }
 
 export function isValidDob(dob: string): boolean {

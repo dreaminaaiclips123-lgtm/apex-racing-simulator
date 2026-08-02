@@ -6,13 +6,23 @@
   --color-surface-2: #1c1f25;
   --color-ink: #f4f3ef;
   --color-ink-dim: #9a9da6;
-  --color-ink-faint: #5c5f68;
-  --color-accent: #e8232b;
+  /* WCAG AA fix: #5c5f68 was 2.6–3.1:1 against these dark backgrounds (fails
+     4.5:1) for real content — stat labels, footer, error/status text. */
+  --color-ink-faint: #8b8e97;
+  /* WCAG AA fix: a single accent color can't hit 4.5:1 both as text-on-dark
+     AND as a background under ink text (the luminance bands don't overlap —
+     verified by direct calculation), so solid buttons/selected-states use
+     --color-accent-btn (a darker red under light text) while text/border
+     uses keep --color-accent (brightened slightly for its own 4.5:1). */
+  --color-accent: #ef2b32;
+  --color-accent-btn: #c01920;
   --color-accent-dim: #7a1216;
   --color-accent-2: #f2b633;
   --color-go: #33c36b;
   --color-go-dim: #16281d;
-  --color-stop: #b5474f;
+  /* WCAG AA fix: #b5474f was 3.4–3.7:1 against these backgrounds (fails
+     4.5:1) — this is the color used for every user-facing error message. */
+  --color-stop: #e8737a;
   --color-stop-dim: #2a1518;
   --color-line: rgba(244, 243, 239, 0.1);
 
@@ -48,6 +58,17 @@
     0%, 100% { opacity: 0.5; }
     50% { opacity: 1; }
   }
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Hero's on-mount entrance animations — plain CSS instead of Framer Motion
+   so Hero can be a Server Component (it's always in the initial viewport,
+   so there's no scroll-trigger logic to justify a client bundle here). */
+.animate-fade-in-up {
+  animation: fade-in-up 0.7s var(--ease-out-strong) both;
 }
 
 html {

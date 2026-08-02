@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { readBookings } from "@/lib/store";
 import MyBookingsList from "./MyBookingsList";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "My Bookings — Apex Racing Simulator",
+  description: "View and manage your upcoming racing simulator bookings.",
+  robots: { index: false, follow: false },
+};
 
 export default async function MyBookingsPage() {
   const session = await getSession();

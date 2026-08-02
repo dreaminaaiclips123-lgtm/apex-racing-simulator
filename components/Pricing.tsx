@@ -40,7 +40,7 @@ export default function Pricing() {
                 }`}
               >
                 {plan.tag && (
-                  <span className="absolute -top-3 left-8 rounded-full bg-accent px-3 py-1 text-[10px] uppercase tracking-wide text-ink">
+                  <span className="absolute -top-3 left-8 rounded-full bg-accent-btn px-3 py-1 text-[10px] uppercase tracking-wide text-ink">
                     {plan.tag}
                   </span>
                 )}
@@ -61,7 +61,7 @@ export default function Pricing() {
                 </ul>
                 <a
                   href="#book"
-                  className="mt-7 block text-center rounded-md border border-line py-3 text-display uppercase tracking-wide text-ink hover:bg-accent hover:border-accent transition-colors"
+                  className="mt-7 block text-center rounded-md border border-line py-3 text-display uppercase tracking-wide text-ink hover:bg-accent-btn hover:border-accent transition-colors"
                 >
                   Book {plan.duration} min
                 </a>

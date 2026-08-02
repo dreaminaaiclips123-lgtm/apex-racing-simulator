@@ -1,11 +1,18 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { readBookings } from "@/lib/store";
-import { formatDateKey } from "@/lib/booking";
+import { bookingStartDate } from "@/lib/booking";
 import { findUserById, SUPER_ADMIN_EMAIL } from "@/lib/userStore";
 import AdminBookingsList from "./AdminBookingsList";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Staff Dashboard — Apex Racing Simulator",
+  description: "Manage bookings and admin access for Apex Racing Simulator.",
+  robots: { index: false, follow: false },
+};
 
 export default async function AdminPage() {
   const session = await getSession();
@@ -17,12 +24,8 @@ export default async function AdminPage() {
   const isSuperAdmin = currentAdmin?.email === SUPER_ADMIN_EMAIL;
 
   const bookings = await readBookings();
-  const now = new Date();
-  const todayKey = formatDateKey(now);
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  const upcoming = bookings.filter(
-    (b) => b.date > todayKey || (b.date === todayKey && b.endMinute > nowMinutes)
-  );
+  const now = Date.now();
+  const upcoming = bookings.filter((b) => bookingStartDate(b.date, b.endMinute).getTime() > now);
 
   return <AdminBookingsList bookings={upcoming} isSuperAdmin={isSuperAdmin} />;
 }

@@ -27,7 +27,7 @@ export default function Modes() {
             return (
               <Reveal key={key} delay={i * 0.08}>
                 <div className="group h-full rounded-lg border border-line bg-surface p-7 flex items-start gap-5 hover:border-accent/50 transition-colors">
-                  <div className="shrink-0 rounded-md bg-surface-2 p-3.5 text-accent group-hover:bg-accent group-hover:text-ink transition-colors">
+                  <div className="shrink-0 rounded-md bg-surface-2 p-3.5 text-accent group-hover:bg-accent-btn group-hover:text-ink transition-colors">
                     <Icon size={26} />
                   </div>
                   <div>

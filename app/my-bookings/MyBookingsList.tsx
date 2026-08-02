@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { bookingStartDate, minutesToLabel, parseDateKey, type BookingRecord } from "@/lib/booking";
 import { MODES, SIMULATORS } from "@/lib/constants";
@@ -20,7 +20,15 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [now] = useState(() => Date.now());
+  // Recomputed on an interval (not captured once) so the 6h cancel-lock
+  // state and past/upcoming split don't go stale on a tab left open across
+  // the cutoff — the server re-validates on cancel regardless, but the
+  // button state itself should stay honest without a manual reload.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
   const upcoming = items
     .filter((b) => bookingStartDate(b.date, b.startMinute).getTime() > now)
     .sort((a, b) => bookingStartDate(a.date, a.startMinute).getTime() - bookingStartDate(b.date, b.startMinute).getTime());
@@ -36,14 +44,19 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
   async function cancel(id: string) {
     setPending(id);
     setError(null);
-    const res = await fetch(`/api/bookings/${id}`, { method: "DELETE" });
-    const data = await res.json();
-    if (res.ok) {
-      setItems((prev) => prev.filter((b) => b.id !== id));
-    } else {
-      setError(data.error ?? "Couldn't cancel that booking.");
+    try {
+      const res = await fetch(`/api/bookings/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (res.ok) {
+        setItems((prev) => prev.filter((b) => b.id !== id));
+      } else {
+        setError(data.error ?? "Couldn't cancel that booking.");
+      }
+    } catch {
+      setError("Network error — please try again.");
+    } finally {
+      setPending(null);
     }
-    setPending(null);
   }
 
   return (
@@ -57,7 +70,7 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/#book"
-              className="rounded-md bg-accent px-4 py-2 text-sm text-display uppercase tracking-wide text-ink"
+              className="rounded-md bg-accent-btn px-4 py-2 text-sm text-display uppercase tracking-wide text-ink"
             >
               Book a slot
             </Link>
@@ -70,7 +83,11 @@ export default function MyBookingsList({ bookings }: { bookings: BookingRecord[]
           </div>
         </div>
 
-        {error && <p className="text-stop text-sm mb-4">{error}</p>}
+        {error && (
+          <p role="alert" aria-live="assertive" className="text-stop text-sm mb-4">
+            {error}
+          </p>
+        )}
 
         <h2 className="text-display text-lg text-accent-2 uppercase tracking-wide mb-3">Upcoming</h2>
         {upcoming.length === 0 ? (

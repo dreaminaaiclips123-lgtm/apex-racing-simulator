@@ -76,7 +76,7 @@ export default function Footer() {
           </p>
           <a
             href="/#book"
-            className="inline-block mt-5 rounded-md bg-accent px-5 py-2.5 text-sm text-display uppercase tracking-wide text-ink hover:bg-ink hover:text-bg transition-colors"
+            className="inline-block mt-5 rounded-md bg-accent-btn px-5 py-2.5 text-sm text-display uppercase tracking-wide text-ink hover:bg-ink hover:text-bg transition-colors"
           >
             Book a slot
           </a>

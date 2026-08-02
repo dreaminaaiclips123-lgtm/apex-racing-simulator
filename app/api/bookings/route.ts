@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import {
+  addDaysToKey,
   assignRig,
   computeDayAvailability,
-  formatDateKey,
   isPastSlot,
+  todayKeyCairo,
   type BookingRecord,
 } from "@/lib/booking";
 import { readBookings, withBookingsTransaction } from "@/lib/store";
@@ -25,10 +26,8 @@ const DURATIONS: DurationMinutes[] = [30, 60];
 
 function isValidDate(date: string): boolean {
   if (!DATE_RE.test(date)) return false;
-  const today = formatDateKey(new Date());
-  const max = formatDateKey(
-    new Date(Date.now() + BOOKABLE_DAYS_AHEAD * 24 * 60 * 60 * 1000)
-  );
+  const today = todayKeyCairo();
+  const max = addDaysToKey(today, BOOKABLE_DAYS_AHEAD);
   return date >= today && date <= max;
 }
 

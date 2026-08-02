@@ -14,8 +14,18 @@ const EXIT_DURATION_S = 0.7;
 // I already played?"; it can assume the answer is no the moment it mounts.
 type Phase = "loading" | "playing" | "exiting" | "done";
 
+// Also treated as "skip the heavy video" when the visitor has Data Saver on
+// or a slow connection — a multi-MB autoplay video is a real, measured cost
+// (0.8-1MB+ before a slow-4G visitor could even finish downloading it) that
+// data-saver users have explicitly opted out of.
 function getReducedMotionSnapshot(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const nav = navigator as Navigator & {
+    connection?: { saveData?: boolean; effectiveType?: string };
+  };
+  const conn = nav.connection;
+  const slowConnection =
+    !!conn?.saveData || conn?.effectiveType === "slow-2g" || conn?.effectiveType === "2g";
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches || slowConnection;
 }
 
 function subscribeReducedMotion(callback: () => void) {
@@ -65,6 +75,22 @@ export default function RacingIntro() {
     phaseRef.current = "exiting";
     setPhase("exiting");
     timers.current.push(setTimeout(() => setPhase("done"), EXIT_DURATION_S * 1000));
+  }
+
+  // A real user gesture can always start playback, regardless of whatever
+  // autoplay policy blocked the automatic attempt — so a tap while still
+  // "loading" tries to force the video to actually start, rather than
+  // skipping it outright. The video is pointer-events-none, so a tap never
+  // reaches any native play button the browser might have drawn over it;
+  // this is the only way a blocked-autoplay visitor can ever get it moving.
+  function handleTap() {
+    if (reducedMotion || phaseRef.current === "playing") {
+      finish();
+      return;
+    }
+    if (phaseRef.current === "loading") {
+      videoRef.current?.play().catch(() => {});
+    }
   }
 
   // Schedules the timer for whichever opening state we're in. Purely a side
@@ -118,20 +144,32 @@ export default function RacingIntro() {
   return (
     <motion.div
       className="fixed inset-0 z-100 bg-bg overflow-hidden"
-      // Tap-to-skip: Escape is invisible on a touchscreen, so without this a
-      // slow/blocked video leaves a mobile visitor with no way out at all.
-      // Only armed once we know the video is actually playing (or in the
-      // reduced-motion static fallback) — the video is pointer-events-none,
-      // so during "loading" any click (including an attempt to hit a
-      // browser's own blocked-autoplay play button) passes straight through
-      // to this handler; arming it that early skipped the intro on the very
-      // first click before the video ever got a chance to start.
-      onClick={phase === "playing" || reducedMotion ? finish : undefined}
+      // Tap anywhere: forces playback if autoplay got blocked (a real user
+      // gesture is always allowed to start a video, no exceptions), or skips
+      // if it's already playing. Escape remains a hidden keyboard fallback,
+      // but touchscreens have no Escape key at all.
+      onClick={handleTap}
       animate={
         phase === "exiting" ? { opacity: 0, scale: 1.06 } : { opacity: 1, scale: 1 }
       }
       transition={{ duration: EXIT_DURATION_S, ease: [0.16, 1, 0.3, 1] }}
     >
+      {/* Real focusable control, not just the hidden Escape-key fallback —
+          a keyboard or screen-reader visitor had no discoverable way to skip
+          this before. stopPropagation so it doesn't also trigger handleTap
+          on the overlay behind it. */}
+      {!reducedMotion && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            finish();
+          }}
+          className="absolute bottom-6 right-6 z-10 rounded-md border border-line bg-bg/60 px-4 py-2 text-xs uppercase tracking-wide text-ink-dim backdrop-blur hover:text-ink hover:border-ink transition-colors"
+        >
+          Skip intro
+        </button>
+      )}
       {reducedMotion ? (
         <motion.div
           className="h-full w-full flex flex-col items-center justify-center gap-3"

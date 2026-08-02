@@ -5,6 +5,7 @@ import { BUSINESS } from "@/lib/constants";
 export const metadata: Metadata = {
   title: `Privacy Policy — ${BUSINESS.name}`,
   description: `How ${BUSINESS.name} collects, uses, and protects your information.`,
+  alternates: { canonical: "/privacy" },
 };
 
 const LAST_UPDATED = "31 July 2026";

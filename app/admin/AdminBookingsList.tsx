@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { minutesToLabel, parseDateKey, type BookingRecord } from "@/lib/booking";
 import { MODES, SIMULATORS } from "@/lib/constants";
 import AdminsPanel from "./AdminsPanel";
@@ -23,6 +24,23 @@ export default function AdminBookingsList({
   const [pending, setPending] = useState<string | null>(null);
   const [items, setItems] = useState(bookings);
   const [showAdminsPanel, setShowAdminsPanel] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    setItems(bookings);
+  }, [bookings]);
+
+  // Two staff members can have this dashboard open at once with no way to
+  // see each other's changes short of a manual reload — refresh the server
+  // data whenever this tab regains focus.
+  useEffect(() => {
+    function onFocus() {
+      router.refresh();
+    }
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [router]);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -31,11 +49,20 @@ export default function AdminBookingsList({
 
   async function cancel(id: string) {
     setPending(id);
-    const res = await fetch(`/api/bookings/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      setItems((prev) => prev.filter((b) => b.id !== id));
+    setError(null);
+    try {
+      const res = await fetch(`/api/bookings/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setItems((prev) => prev.filter((b) => b.id !== id));
+      } else {
+        const data = await res.json();
+        setError(data.error ?? "Couldn't cancel that booking.");
+      }
+    } catch {
+      setError("Network error — please try again.");
+    } finally {
+      setPending(null);
     }
-    setPending(null);
   }
 
   const grouped = items.reduce<Record<string, BookingRecord[]>>((acc, b) => {
@@ -73,6 +100,12 @@ export default function AdminBookingsList({
 
         {isSuperAdmin && showAdminsPanel && (
           <AdminsPanel onDone={() => setShowAdminsPanel(false)} />
+        )}
+
+        {error && (
+          <p role="alert" aria-live="assertive" className="text-stop text-sm mb-4">
+            {error}
+          </p>
         )}
 
         {dates.length === 0 && (

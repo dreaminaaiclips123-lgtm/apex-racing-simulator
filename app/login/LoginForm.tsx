@@ -75,7 +75,7 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
   }
 
   const inputClass =
-    "w-full rounded-md border border-line bg-surface-2 px-4 py-3 text-ink outline-none focus:border-accent transition-colors";
+    "w-full rounded-md border border-line bg-surface-2 px-4 py-3 text-ink outline-none focus:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface transition-colors";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg px-6 py-16">
@@ -93,7 +93,7 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
               setError(null);
             }}
             className={`flex-1 py-2.5 uppercase tracking-wide transition-colors ${
-              mode === "login" ? "bg-accent text-ink" : "text-ink-dim hover:text-ink"
+              mode === "login" ? "bg-accent-btn text-ink" : "text-ink-dim hover:text-ink"
             }`}
           >
             Log in
@@ -105,7 +105,7 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
               setError(null);
             }}
             className={`flex-1 py-2.5 uppercase tracking-wide transition-colors ${
-              mode === "signup" ? "bg-accent text-ink" : "text-ink-dim hover:text-ink"
+              mode === "signup" ? "bg-accent-btn text-ink" : "text-ink-dim hover:text-ink"
             }`}
           >
             Sign up
@@ -115,54 +115,101 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
         <form onSubmit={mode === "login" ? submitLogin : submitSignup} className="space-y-4">
           {mode === "signup" && (
             <>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Full name"
-                className={inputClass}
-              />
               <div>
-                <label className="block text-xs text-ink-dim uppercase tracking-wide mb-1.5">
-                  Date of birth
+                <label htmlFor="name" className="block text-xs text-ink-dim uppercase tracking-wide mb-1.5">
+                  Full name
                 </label>
                 <input
-                  type="date"
-                  value={dob}
-                  onChange={(e) => setDob(e.target.value)}
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Full name"
+                  autoComplete="name"
+                  required
                   className={inputClass}
                 />
               </div>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Phone number"
-                className={inputClass}
-              />
+              <div>
+                <label htmlFor="dob" className="block text-xs text-ink-dim uppercase tracking-wide mb-1.5">
+                  Date of birth
+                </label>
+                <input
+                  id="dob"
+                  type="date"
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-xs text-ink-dim uppercase tracking-wide mb-1.5">
+                  Phone number
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Phone number"
+                  autoComplete="tel"
+                  required
+                  className={inputClass}
+                />
+              </div>
             </>
           )}
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            className={inputClass}
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className={inputClass}
-          />
-          {mode === "signup" && (
+          <div>
+            <label htmlFor="email" className="block text-xs text-ink-dim uppercase tracking-wide mb-1.5">
+              Email
+            </label>
             <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm password"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              autoComplete="email"
+              required
               className={inputClass}
             />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-xs text-ink-dim uppercase tracking-wide mb-1.5">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
+              required
+              minLength={mode === "signup" ? 8 : undefined}
+              className={inputClass}
+            />
+          </div>
+          {mode === "signup" && (
+            <div>
+              <label
+                htmlFor="confirm-password"
+                className="block text-xs text-ink-dim uppercase tracking-wide mb-1.5"
+              >
+                Confirm password
+              </label>
+              <input
+                id="confirm-password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm password"
+                autoComplete="new-password"
+                required
+                minLength={8}
+                className={inputClass}
+              />
+            </div>
           )}
 
           {mode === "signup" && (
@@ -196,12 +243,16 @@ export default function LoginForm({ returnTo }: { returnTo: string | null }) {
             </label>
           )}
 
-          {error && <p className="text-stop text-sm">{error}</p>}
+          {error && (
+            <p role="alert" aria-live="assertive" className="text-stop text-sm">
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"
             disabled={loading || (mode === "signup" && !agreedToTerms)}
-            className="w-full rounded-md bg-accent py-3 text-display uppercase tracking-wide text-ink disabled:opacity-50 transition-opacity"
+            className="w-full rounded-md bg-accent-btn py-3 text-display uppercase tracking-wide text-ink disabled:opacity-50 transition-opacity"
           >
             {loading ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
           </button>
