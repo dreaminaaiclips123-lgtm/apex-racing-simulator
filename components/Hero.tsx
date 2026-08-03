@@ -28,27 +28,40 @@ export default function Hero() {
           to expose. */}
       {/* ROOT CAUSE of the long-running "grid disappears until I zoom in" bug:
           sub-pixel rasterization. rotateX + perspective foreshortens the plane,
-          so a hairline 1px grid line gets scaled *down* with depth. Measured
-          with the old values (perspective:30vw, rotateX:78deg), lines fell to
-          0.39x scale at the far end — 0.39 device px on a DPR-1 monitor — and
-          then got multiplied by opacity-25, leaving ~10% pixel coverage against
-          a near-black background. The rasterizer discards that, so the grid is
-          simply not painted. Browser zoom raises the device-pixel budget for
-          the same CSS px, pushing those lines back over the 1-device-px
+          so a hairline grid line gets scaled *down* with depth. The original
+          design (perspective:300px, rotateX:78deg, 1px lines) squashed the far
+          edge to 0.30x — i.e. 0.30 device px on a DPR-1 monitor — then
+          multiplied that by opacity-25, leaving ~10% pixel coverage against a
+          near-black background. The rasterizer discards that, so the grid was
+          simply never painted. Browser zoom raises the device-pixel budget for
+          the same CSS px, pushing the lines back over the 1-device-px
           threshold, which is exactly why zooming made it reappear.
 
-          Fix is dimensional, not cosmetic: keep every line >= 1 device px even
-          at maximum depth on a DPR-1 screen.
-            - perspective 30vw -> 55vw and rotateX 78 -> 74deg, so the worst-case
-              depth scale rises from 0.39 to ~0.55
-            - line width 1px/2px -> 3px, so worst case is 3 * 0.55 ~= 1.6 device
-              px (was 0.39) — comfortably above the threshold
-            - opacity 0.25 -> 0.4 to restore the intended look now that the
-              lines are no longer being silently thinned away
+          Important: the shallow perspective was NOT the bug — it is what gives
+          the plane its dramatic, rapidly-converging foreshortening (squares
+          compressing hard toward the horizon). An earlier fix "solved" the
+          invisibility by deepening perspective to 55vw / rotateX 74deg, which
+          did raise the far scale to 0.55 but flattened the look into near-
+          uniform checkers. So the geometry is restored here and the *line
+          width* carries the fix instead:
+            - perspective 20vmax == the original 300px at a 1500x950 viewport,
+              but viewport-relative so it no longer changes with browser zoom
+            - rotateX back to the original 78deg  -> far scale 0.301 (dramatic)
+            - line width 1px/2px -> 5px, so the far edge lands at
+              5 * 0.301 = 1.50 device px, comfortably above the 1.0 floor
+
+          vmax, not vw: the plane's depth scales with viewport *height*
+          (h-[75%]), so on a narrow/tall viewport a vw-based perspective
+          collapses. Measured at 375x812, 20vw gives a far scale of 0.112 =
+          0.56 device px on DPR-1, i.e. the original bug straight back on
+          mobile and in tall browser windows. vmax keeps it at 0.214 / 1.07
+          device px there, and is identical to vw on desktop (300px either
+          way), so the restored look is unaffected.
+
           Tile size stays 64px so the animation still translates exactly one
           tile per loop. */}
-      <div className="absolute inset-0 [perspective:55vw] overflow-hidden">
-        <div className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(74deg)] opacity-40 overflow-hidden">
+      <div className="absolute inset-0 [perspective:20vmax] overflow-hidden">
+        <div className="absolute inset-x-[-50%] bottom-[-10%] h-[75%] [transform:rotateX(78deg)] opacity-30 overflow-hidden">
           {/* Extends 64px above its box and translates by exactly one tile
               (transform, not background-position) so the loop is GPU-composited
               instead of repainting every frame — background-position animation
@@ -57,7 +70,7 @@ export default function Hero() {
             className="absolute inset-x-0 -top-16 h-[calc(100%+64px)] animate-track"
             style={{
               backgroundImage:
-                "repeating-linear-gradient(90deg, var(--color-ink) 0 3px, transparent 3px 64px), repeating-linear-gradient(0deg, var(--color-ink) 0 3px, transparent 3px 64px)",
+                "repeating-linear-gradient(90deg, var(--color-ink) 0 5px, transparent 5px 64px), repeating-linear-gradient(0deg, var(--color-ink) 0 5px, transparent 5px 64px)",
               backgroundSize: "64px 64px, 100% 64px",
             }}
           />
