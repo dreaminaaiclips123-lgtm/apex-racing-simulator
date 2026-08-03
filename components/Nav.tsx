@@ -53,7 +53,14 @@ export default function Nav({ session }: { session: NavSession | null }) {
         aria-hidden="true"
         className="hidden md:block overflow-hidden border-b border-line bg-bg/95 text-[11px] tracking-[0.25em] text-ink-faint"
       >
-        <div className="flex animate-marquee whitespace-nowrap py-1.5">
+        {/* will-change forces this onto its own compositor layer — without it
+            some engines (this has specifically been reported on Safari) can
+            let an infinite transform animation fall off the compositor
+            thread, producing a visible stutter/snap at each loop restart
+            even though the two duplicated halves measure pixel-identical
+            (verified: both render at the same width, so the loop math itself
+            isn't the problem). */}
+        <div className="flex animate-marquee whitespace-nowrap py-1.5 will-change-transform">
           {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
             <span key={i} className="mx-6 flex items-center gap-2">
               <span className="h-1 w-1 rounded-full bg-accent-btn" />
