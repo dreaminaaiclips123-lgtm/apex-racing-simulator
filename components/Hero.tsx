@@ -62,23 +62,28 @@ export default function Hero() {
             }}
           />
         </div>
-        {/* Horizon fade / vignette, tuned against measured coverage rather
-            than by eye — this gradient has twice been the cause of a real
-            bug, in both directions:
-              - too tight (65% radius, transparent at 25%) put the screen
-                edges 77% into the opaque stop and erased them
-              - too wide (140% radius, transparent at 55%) put the edges at
-                0% and removed the fade entirely
-            These values sit deliberately between the two. Measured coverage:
-            ~0% at bottom-centre (foreground stays crisp), ~39% at the left
-            and right screen edges (a visible vignette that still leaves the
-            grid clearly rendered there), and 100% at the horizon so the
-            plane fades into the distance instead of ending on a hard edge. */}
+        {/* Horizon fade / vignette. Tuned against the *composited pixel
+            value* of a grid line, not against coverage percentages — reading
+            coverage alone is what made the two previous attempts wrong in
+            opposite directions:
+              65% radius / transparent 25% -> edges 77% covered, grid erased
+              140% radius / transparent 55% -> edges 0% covered, no fade
+              75% radius / transparent 45% -> edges faded, but the horizon
+                still sat at rgb(50,51,52) against a rgb(10,11,13) page, so
+                the plane visibly *ended* rather than receding, i.e. still
+                read as "no vignette"
+            With these values a line composites to roughly:
+              rgb(104,104,103) at the bottom centre  (crisp foreground)
+              rgb( 56, 57, 58) at the left/right edges (clear vignette, and
+                                 still well above the visibility floor —
+                                 lines are 3px / ~1.6 device px here)
+              rgb( 14, 15, 17) at the horizon         (dissolves into the
+                                 rgb(10,11,13) background) */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 75% 72% at 50% 100%, transparent 45%, var(--color-bg) 100%)",
+              "radial-gradient(ellipse 85% 60% at 50% 100%, transparent 22%, var(--color-bg) 95%)",
           }}
         />
       </div>
